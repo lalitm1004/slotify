@@ -26,7 +26,7 @@
             name="Time format switch"
             {checked}
             {onCheckedChange}
-            class={`relative h-6 w-12 inline-flex items-center rounded-full border-2 border-neutral-800  bg-neutral-100 cursor-pointer`}
+            class={`relative h-6 w-12 inline-flex items-center rounded-full border-2 border-neutral-800  bg-transparent cursor-pointer`}
         >
             <Switch.Thumb
                 class={`h-4 inline-block aspect-square transform rounded-full bg-neutral-950 shadow-lg ring-0 transition-transform duration-200 ease-in-out data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-1`}

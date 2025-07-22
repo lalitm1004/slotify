@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ExternalLink } from "@lucide/svelte";
     import { Button } from "bits-ui";
-    import TimeFormat from "./TimeFormat.svelte";
+    import TimeFormat from "$lib/components/TimeFormat.svelte";
 </script>
 
 <header
