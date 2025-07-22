@@ -4,7 +4,9 @@
     import TimeFormat from "./TimeFormat.svelte";
 </script>
 
-<header class={`h-[60px] w-[96ch] flex justify-between items-center mx-auto`}>
+<header
+    class={`h-[60px] md:w-[96ch] flex justify-between items-center mx-auto`}
+>
     <nav>
         <h1 class={`font-amulya font-bold italic text-3xl`}>
             <Button.Root href={`/`}>slotify</Button.Root>

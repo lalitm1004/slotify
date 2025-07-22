@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+@custom-variant mobile (&:where([data-device=mobile], [data-device=mobile] *));
+@custom-variant desktop (&:where([data-device=desktop], [data-device=desktop] *));
+
 @theme {
     --font-amulya: 'Amulya', sans-serif;
     --font-quattro: 'Quattro', sans-serif;
