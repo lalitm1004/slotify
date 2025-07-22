@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+from datetime import datetime, time
 from enum import Enum
 from nanoid import generate
 from pydantic import BaseModel, Field, field_validator
@@ -129,8 +130,30 @@ class CourseEntry(BaseModel):
         return (component_type, int(number))
 
     @field_validator("start_time", "end_time", mode="before")
-    def parse_to_str(cls, value: Any) -> str:
-        return str(value).strip()
+    def parse_time(cls, value: str) -> Optional[str]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+
+        if isinstance(value, time):
+            return value.strftime("%H:%M")
+
+        if isinstance(value, str):
+            value = value.strip()
+            try:
+                dt = datetime.strptime(value, "%H:%M:%S")
+            except ValueError:
+                try:
+                    dt = datetime.strptime(value, "%H:%M")
+                except ValueError:
+                    raise ValueError(f"Invalid time format: '{value}'")
+
+            return dt.strftime("%H:%M")
+
+        raise ValueError(
+            f"Invalid type for time field: {type(value)}. Expected str or datetime.time"
+        )
+        
+
 
     @field_validator("faculty", mode="before")
     def parse_faculty(cls, value: str) -> str:
