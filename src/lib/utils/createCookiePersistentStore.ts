@@ -10,10 +10,10 @@ export interface PersistentStoreConfig<T> {
     decode: (raw: string) => T;
 }
 
-const createPersistentStore = <T>({
+const createCookiePersistentStore = <T>({
     tokenName,
     initialValue = null,
-    maxAgeSec = 60 * 60 * 24 * 30 * 3, // 3 months
+    maxAgeSec = 60 * 60 * 24 * 365,
     encode,
     decode,
 }: PersistentStoreConfig<T>): {
@@ -60,4 +60,4 @@ const createPersistentStore = <T>({
     }
 }
 
-export default createPersistentStore;
+export default createCookiePersistentStore;

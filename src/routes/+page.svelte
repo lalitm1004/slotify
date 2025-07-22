@@ -1,10 +1,12 @@
 <script lang="ts">
     import { CourseEntryStore } from "$lib/stores/CourseEntryStore";
+    import { Use12HFormat } from "$lib/stores/MiscStores";
 </script>
 
-<pre>
+{$Use12HFormat}
+<!-- <pre>
 {JSON.stringify($CourseEntryStore, null, 2)}
-</pre>
+</pre> -->
 
 <svelte:head>
     <title>slotify</title>

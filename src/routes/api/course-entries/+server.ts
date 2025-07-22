@@ -3,7 +3,6 @@ import { CourseEntryListSchema } from "$lib/types/courseEntry.type";
 import timetableJson from "$lib/data/time-table-minified.json";
 
 export const GET = async () => {
-    console.log('endpoint hit')
     const result = CourseEntryListSchema.safeParse(timetableJson);
 
     if (!result.success) {
