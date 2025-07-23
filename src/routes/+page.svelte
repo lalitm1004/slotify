@@ -17,4 +17,8 @@
 
 <svelte:head>
     <title>slotify</title>
+    <meta
+        name="description"
+        content="Simplify looking for clashes with slotify. Simply select your core courses and let slotify crush your dreams of taking that UWE you've been eyeing for two semesters"
+    />
 </svelte:head>
