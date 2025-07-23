@@ -11,7 +11,7 @@
     };
 
     let isLoaded = $state(false);
-    $effect(() => {
+    onMount(() => {
         isLoaded = true;
     });
 </script>
