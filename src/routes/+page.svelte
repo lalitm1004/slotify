@@ -3,7 +3,7 @@
     import SelectedCourseGallery from "$lib/components/SelectedCourseGallery.svelte";
 </script>
 
-<main class={`min-h-dvh w-dvw px-20 flex pb-20`}>
+<main class={`mobile:hidden min-h-dvh w-dvw px-20 flex pb-20`}>
     <section class={`gallery w-[70%]`}>
         <CourseGallery />
     </section>

@@ -23,7 +23,7 @@
 
         <Button.Root
             onclick={() => clearSelectedCourses()}
-            class={`flex items-center gap-2 px-2 py-1 tracking-tighter border-2 border-neutral-800 hover:bg-red-500 rounded-md cursor-pointer transition-colors duration-200`}
+            class={`flex items-center gap-2 px-2 py-1 tracking-tighter border-2 border-neutral-800 hover:bg-red-400 rounded-md cursor-pointer transition-colors duration-200`}
         >
             Clear All
             <Trash />
@@ -36,6 +36,7 @@
                 {course}
                 shouldDisplay={true}
                 isClashing={false}
+                clashingWith={[]}
                 isSelected={true}
             />
         {/each}

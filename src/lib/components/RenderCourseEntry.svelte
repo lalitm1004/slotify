@@ -8,16 +8,19 @@
         selectCourse,
         unselectCourse,
     } from "$lib/stores/SelectedCoursesStore";
+    import ClashAlert from "./ClashAlert.svelte";
 
     let {
         course,
         shouldDisplay,
         isClashing,
+        clashingWith,
         isSelected,
     }: {
         course: CourseEntry;
         shouldDisplay: boolean;
         isClashing: boolean;
+        clashingWith: CourseEntry["id"][];
         isSelected: boolean;
     } = $props();
 
@@ -51,16 +54,16 @@
         {#if isSelected}
             <Button.Root
                 onclick={() => unselectCourse(course.id)}
-                class={`border-2 border-neutral-800 rounded-md cursor-pointer hover:bg-red-500 transition-colors duration-200`}
+                class={`border-2 border-neutral-800 rounded-md cursor-pointer hover:bg-red-400 transition-colors duration-200`}
             >
                 <Minus size={24} />
             </Button.Root>
         {:else if isClashing}
-            <TriangleAlert />
+            <ClashAlert {clashingWith} />
         {:else}
             <Button.Root
                 onclick={() => selectCourse(course.id)}
-                class={`border-2 border-neutral-800 rounded-md cursor-pointer hover:bg-green-500 transition-colors duration-200`}
+                class={`border-2 border-neutral-800 rounded-md cursor-pointer hover:bg-green-400 transition-colors duration-200`}
             >
                 <Plus size={24} />
             </Button.Root>

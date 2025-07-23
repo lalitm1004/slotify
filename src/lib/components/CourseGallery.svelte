@@ -8,15 +8,10 @@
 
     let courseCodeFilter: string = $state("");
     let courseNameFilter: string = $state("");
-    // let displayOnlyOpenAsUWE: boolean = $state(false);
 
     let courseEntries = $derived.by(() => $CourseEntryStore ?? []);
     const filteredCourseIDs = $derived.by(() => {
         let filtered = courseEntries;
-
-        // if (displayOnlyOpenAsUWE) {
-        //     filtered.filter((c) => c.open_as_uwe);
-        // }
 
         if (courseCodeFilter.trim()) {
             filtered = filtered.filter((course) =>
@@ -87,6 +82,48 @@
         return false;
     };
 
+    const clashingWith = (course: CourseEntry): CourseEntry["id"][] => {
+        const selectedCourses = $CourseEntryStore.filter((c) =>
+            ($SelectedCoursesStore ?? []).includes(c.id),
+        );
+
+        const clashes: string[] = [];
+
+        for (const selectedCourse of selectedCourses) {
+            const sharedDays = course.days.filter((day) =>
+                selectedCourse.days.includes(day),
+            );
+
+            if (sharedDays.length === 0) continue;
+
+            if (
+                !course.start_time ||
+                !course.end_time ||
+                !selectedCourse.start_time ||
+                !selectedCourse.end_time
+            )
+                continue;
+
+            const [startA, endA] = [
+                toMinutes(course.start_time),
+                toMinutes(course.end_time),
+            ];
+
+            const [startB, endB] = [
+                toMinutes(selectedCourse.start_time),
+                toMinutes(selectedCourse.end_time),
+            ];
+
+            const overlap = startA < endB && startB < endA;
+
+            if (overlap) {
+                clashes.push(selectedCourse.id);
+            }
+        }
+
+        return clashes;
+    };
+
     const toMinutes = (time: string): number => {
         const [hours, minutes] = time.split(":").map(Number);
         return hours * 60 + minutes;
@@ -112,17 +149,6 @@
                 class={`px-1 border-2 border-neutral-800 rounded-md`}
             />
         </div>
-
-        <!-- <div class={`flex items-center`}>
-            <Label.Root for={`open-as-uwe`}>Open as UWE:</Label.Root>
-
-            <input
-                id={`open-as-uwe`}
-                bind:checked={displayOnlyOpenAsUWE}
-                type="checkbox"
-                class={`w-5 h-5 text-transparent bg-transparent border-neutral-800 rounded-md cursor-pointer`}
-            />
-        </div> -->
     </div>
 
     <hr class={`border border-neutral-800 my-3`} />
@@ -133,6 +159,7 @@
                 {course}
                 shouldDisplay={shouldDisplay(course)}
                 isClashing={isClashing(course)}
+                clashingWith={clashingWith(course)}
                 isSelected={false}
             />
         {/each}
