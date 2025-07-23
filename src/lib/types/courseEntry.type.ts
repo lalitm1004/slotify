@@ -33,7 +33,6 @@ export const CourseEntrySchema = z.object({
     course_type: z.string().nullable(),
     action: z.string().nullable(),
     class_notes: z.string().nullable(),
-    remarks: z.string().nullable()
 })
 
 export const CourseEntryListSchema = z.array(CourseEntrySchema);

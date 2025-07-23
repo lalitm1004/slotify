@@ -40,7 +40,6 @@ class CourseEntry(BaseModel):
     course_type: Optional[str]
     action: Optional[str]
     class_notes: Optional[str]
-    remarks: Optional[str]
 
     @field_validator("course_code", mode="before")
     def parse_course_code(cls, value: str) -> str:
@@ -156,7 +155,10 @@ class CourseEntry(BaseModel):
 
 
     @field_validator("faculty", mode="before")
-    def parse_faculty(cls, value: str) -> str:
+    def parse_faculty(cls, value: Union[str, float, None]) -> Optional[str]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+
         if not isinstance(value, str):
             raise ValueError(
                 f"Invalid type for faculty: {type(value)}. Expected a string"
@@ -166,6 +168,9 @@ class CourseEntry(BaseModel):
 
     @field_validator("open_as_uwe", mode="before")
     def parse_open_as_uwe(cls, value: str) -> bool:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return False
+
         if not isinstance(value, str):
             raise ValueError(
                 f"Invalid type for open_as_uwe: {type(value)}. Expected a string"
@@ -181,7 +186,6 @@ class CourseEntry(BaseModel):
         "course_type",
         "action",
         "class_notes",
-        "remarks",
         mode="before",
     )
     def parse_optional_fields(

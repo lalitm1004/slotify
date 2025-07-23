@@ -30,7 +30,6 @@ def parse_excel() -> List[CourseEntry]:
             "Type": "course_type",
             "Action": "action",
             "Class Notes": "class_notes",
-            "Remarks": "remarks",
         }
     )
 
@@ -53,7 +52,6 @@ def parse_excel() -> List[CourseEntry]:
                 course_type=row["course_type"],
                 action=row["action"],
                 class_notes=row["class_notes"],
-                remarks=row["remarks"],
             )
             course_entries.append(entry)
         except Exception as e:
@@ -80,6 +78,7 @@ def save_as_json(
 
 def main():
     course_entries = parse_excel()
+    print(f"Parsed {len(course_entries)} course entries from xlsx file")
     save_as_json(course_entries, minify=True)
 
 
