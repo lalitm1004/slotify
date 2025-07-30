@@ -1,16 +1,17 @@
+import argparse
 import json
 import pandas as pd
 from pathlib import Path
 from typing import Final, List
 
-from models import CourseEntry
+from models import Timetable, CourseEntry
 
 TIMETABLE_XLSX_PATH: Final[Path] = Path("data/time-table.xlsx")
 OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
 OUTPUT_JSON_PATH_MINIFIED: Final[Path] = Path("data/time-table-minified.json")
 
 
-def parse_excel() -> List[CourseEntry]:
+def parse_excel_to_timetable() -> Timetable:
     df = pd.read_excel(TIMETABLE_XLSX_PATH)
 
     df = df.rename(
@@ -57,29 +58,29 @@ def parse_excel() -> List[CourseEntry]:
         except Exception as e:
             print(f"Error processing row {idx} - {row}: {e}")
 
-    return course_entries
+    return Timetable(courses=course_entries)
 
 
 def save_as_json(
-    course_entries: List[CourseEntry],
+    timetable: Timetable,
     minify: bool = False,
 ) -> None:
     output_path = OUTPUT_JSON_PATH_MINIFIED if minify else OUTPUT_JSON_PATH
-
-    with output_path.open("w", encoding="utf-8") as f:
-        json.dump(
-            [entry.model_dump() for entry in course_entries],
-            f,
-            indent=None if minify else 4,
-            separators=(",", ":") if minify else None,
-            ensure_ascii=False,
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(
+            timetable.model_dump_json(indent=None if minify else 4)
         )
 
 
 def main():
-    course_entries = parse_excel()
-    print(f"Parsed {len(course_entries)} course entries from xlsx file")
-    save_as_json(course_entries, minify=True)
+    parser = argparse.ArgumentParser(description="Convert timetable XLSX to JSON.")
+    parser.add_argument("--minify", action="store_true", help="Minify the output JSON")
+    args = parser.parse_args()
+
+    timetable = parse_excel_to_timetable()
+    print(f"Parsed {len(timetable.courses)} course entries from xlsx file")
+    save_as_json(timetable, minify=args.minify)
 
 
 if __name__ == "__main__":

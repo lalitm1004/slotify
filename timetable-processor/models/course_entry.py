@@ -2,9 +2,9 @@ import pandas as pd
 import re
 from datetime import datetime, time
 from enum import Enum
-from nanoid import generate
+from nanoid import generate as gen_nanoid
 from pydantic import BaseModel, Field, field_validator
-from typing import Any, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 
 class Day(str, Enum):
@@ -24,7 +24,7 @@ class ComponentType(str, Enum):
 
 
 class CourseEntry(BaseModel):
-    id: str = Field(default_factory=lambda: generate())
+    id: str = Field(default_factory=lambda: gen_nanoid())
     course_name: str
     course_code: str
     component: Tuple[ComponentType, int]
@@ -151,8 +151,6 @@ class CourseEntry(BaseModel):
         raise ValueError(
             f"Invalid type for time field: {type(value)}. Expected str or datetime.time"
         )
-        
-
 
     @field_validator("faculty", mode="before")
     def parse_faculty(cls, value: Union[str, float, None]) -> Optional[str]:
