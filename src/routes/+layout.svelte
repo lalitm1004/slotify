@@ -36,7 +36,7 @@
 </div>
 
 <div
-	class={`desktop:hidden z-50 absolute top-0 left-0 h-dvh w-dvw bg-zinc-950`}
+	class={`desktop:hidden z-50 absolute top-0 left-0 h-dvh w-dvw bg-neutral-200`}
 >
 	<div
 		class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] flex flex-col items-center justify-center gap-2 py-4 px-2 text-center border-2 border-neutral-800 rounded-md`}
