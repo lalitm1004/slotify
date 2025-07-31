@@ -22,12 +22,10 @@
 
         const entries = clashingCourses.map(
             (c) =>
-                `${c.course_code} - ${renderCourseComponent(c.component)} - ${c.course_name}`,
+                `<li>${c.course_code} - ${renderCourseComponent(c.component)} - ${c.course_name}</li>`,
         );
 
-        return DOMPurify.sanitize(
-            `Clashes with:<br />${entries.join("<br />")}`,
-        );
+        return DOMPurify.sanitize(`Clashes with:<ul>${entries.join("")}</ul>`);
     });
 </script>
 

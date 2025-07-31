@@ -48,10 +48,10 @@ uv run main.py --minify
 ## composition
 ```bash
 $ composition
-Svelte     | 734 lines | 49.63% | ██████████████████████████████████████████████████
-TypeScript | 343 lines | 23.19% | ███████████████████████
-Python     | 284 lines | 19.20% | ███████████████████
-CSS        |  81 lines |  5.48% | █████
-HTML       |  20 lines |  1.35% | █
-JavaScript |  17 lines |  1.15% | █
+Svelte     | 766 lines | 50.69% | ███████████████████████████████████████████████████
+TypeScript | 343 lines | 22.70% | ███████████████████████
+Python     | 284 lines | 18.80% | ███████████████████
+CSS        |  81 lines |  5.36% | █████
+HTML       |  20 lines |  1.32% | █
+JavaScript |  17 lines |  1.13% | █
 ```
