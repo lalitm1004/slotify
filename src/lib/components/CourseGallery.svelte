@@ -13,34 +13,43 @@
 
     let allCourses = $derived($TimetableStore?.courses ?? []);
 
-    let filteredCourseIds: Set<CourseEntryT["id"]> = $derived.by(() => {
-        let filtered = allCourses;
+    let fuseInstance = $derived.by(() => {
+        return new Fuse(allCourses, {
+            keys: ["course_name"],
+            threshold: 0.3,
+            ignoreLocation: true,
+        });
+    });
 
-        if (courseCodeFilter.trim()) {
-            filtered = filtered.filter((c) =>
-                c.course_code
-                    .toLowerCase()
-                    .startsWith(courseCodeFilter.trim().toLowerCase()),
-            );
-        }
+    let filteredCourses = $derived.by(() => {
+        let courses = allCourses;
 
-        if (courseNameFilter.trim()) {
-            const fuse = new Fuse(filtered, {
-                keys: ["course_name"],
-                threshold: 0.3,
-                ignoreLocation: true,
-            });
-
-            const results = fuse.search(courseNameFilter.trim());
-            filtered = results.map((result) => result.item);
-        }
+        if (courses.length === 0) return [];
 
         if (showOpenAsUWE) {
-            filtered = filtered.filter((c) => c.open_as_uwe);
+            courses = courses.filter((c) => c.open_as_uwe);
+            if (courses.length === 0) return [];
         }
 
-        return new Set(filtered.map((c) => c.id));
+        const trimmedCodeFilter = courseCodeFilter.trim().toLowerCase();
+        if (trimmedCodeFilter) {
+            courses = courses.filter((c) =>
+                c.course_code.toLowerCase().startsWith(trimmedCodeFilter),
+            );
+            if (courses.length === 0) return [];
+        }
+
+        const trimmedNameFilter = courseNameFilter.trim();
+        if (trimmedNameFilter) {
+            const results = fuseInstance.search(trimmedNameFilter);
+            const matchIds = new Set(results.map((r) => r.item.id));
+            courses = courses.filter((c) => matchIds.has(c.id));
+        }
+
+        return courses;
     });
+
+    let filteredCourseIds = $derived(new Set(filteredCourses.map((c) => c.id)));
 
     const shouldHide = (id: CourseEntryT["id"]): boolean => {
         if (($SelectedEntriesStore ?? new Set()).has(id)) {
