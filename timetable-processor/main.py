@@ -66,11 +66,9 @@ def save_as_json(
     minify: bool = False,
 ) -> None:
     output_path = OUTPUT_JSON_PATH_MINIFIED if minify else OUTPUT_JSON_PATH
-    
+
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write(
-            timetable.model_dump_json(indent=None if minify else 4)
-        )
+        f.write(timetable.model_dump_json(indent=None if minify else 4))
 
 
 def main():
