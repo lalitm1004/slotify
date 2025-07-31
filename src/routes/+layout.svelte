@@ -3,6 +3,9 @@
 	import Header from "$lib/components/Header.svelte";
 	import { setDevice } from "$lib/stores/DeviceStore";
 	import { onMount } from "svelte";
+	import Footer from "$lib/components/Footer.svelte";
+	import Disclaimer from "$lib/components/Disclaimer.svelte";
+	import cleanupLocalStorage from "$lib/utils/cleanupLocalStorage";
 
 	let { children } = $props();
 
@@ -16,22 +19,29 @@
 
 	onMount(() => {
 		handleDevice();
+		cleanupLocalStorage();
 	});
 </script>
 
 <svelte:window onresize={() => handleDevice()} />
 
-<Header />
+<div class={`mobile:hidden min-h-dvh w-dvw flex flex-col overflow-x-hidden`}>
+	<Header />
 
-{@render children()}
+	{@render children()}
+
+	<Disclaimer />
+
+	<Footer />
+</div>
 
 <div
-	class={`desktop:hidden z-50 absolute top-0 left-0 h-dvh w-dvw bg-neutral-500/50 backdrop-blur-sm`}
+	class={`desktop:hidden z-50 absolute top-0 left-0 h-dvh w-dvw bg-zinc-950`}
 >
 	<div
-		class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] flex flex-col items-center justify-center gap-2 py-4 px-2 text-center bg-neutral-100 border-2 border-neutral-800 rounded-md`}
+		class={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] flex flex-col items-center justify-center gap-2 py-4 px-2 text-center border-2 border-neutral-800 rounded-md`}
 	>
-		<p class={`font-amulya font-bold italic text-3xl`}>slotify</p>
+		<h1 class={`font-amulya font-bold italic text-3xl`}>slotify</h1>
 		<p class={`tracking-tighter`}>
 			Please use a desktop machine. Mobile displays are not currently
 			supported.

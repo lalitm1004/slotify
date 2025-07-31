@@ -1,22 +1,36 @@
 import createCookiePersistentStore from "$lib/utils/createCookiePersistentStore";
-import { writable } from "svelte/store";
-
-export const ErrorStore = writable<string | null>(null);
+import { StringCodec } from "$lib/utils/storeCodecs";
 
 const {
-    store: Use12HFormat, set: setFormatTo12H
-} = createCookiePersistentStore<boolean>({
-    tokenName: "slotify-use-12h-format",
+    store: TimeFormatStore, set: setTimeFormat
+} = createCookiePersistentStore<TimeFormat>({
+    tokenName: "slotify-time-format",
+    initialValue: "12H",
+    encode: (data: TimeFormat) => data as string,
+    decode: (raw: string) => raw as TimeFormat,
+});
+export { TimeFormatStore, setTimeFormat };
 
+const {
+    store: ShowDisclaimer, set: setShowDisclaimer
+} = createCookiePersistentStore<boolean>({
+    tokenName: "slotify-disclaimer",
     initialValue: true,
 
-    encode(data) {
-        return data ? '1' : '0';
+    encode(data: boolean) {
+        return data ? "true" : "false";
     },
 
-    decode(raw) {
-        if (raw === "0") return false;
-        return true;
-    },
+    decode(raw: string) {
+        if (raw === "true") {
+            return true;
+        }
+
+        if (raw === "false") {
+            return false;
+        }
+
+        throw new Error(`invalid boolean string: ${raw}`)
+    }
 });
-export { Use12HFormat, setFormatTo12H };
+export { ShowDisclaimer, setShowDisclaimer };

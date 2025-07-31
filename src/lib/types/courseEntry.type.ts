@@ -1,20 +1,12 @@
 import { z } from "zod"
+import { DayEnum } from "./Day.type";
 
-export const DayEnum = z.enum([
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-])
 
 export const ComponentTypeEnum = z.enum([
     "LEC",
     "TUT",
     "PRAC"
-])
+]);
 
 export const CourseEntrySchema = z.object({
     id: z.string(),
@@ -33,11 +25,10 @@ export const CourseEntrySchema = z.object({
     course_type: z.string().nullable(),
     action: z.string().nullable(),
     class_notes: z.string().nullable(),
-})
+});
 
 export const CourseEntryListSchema = z.array(CourseEntrySchema);
 
 
 export type CourseEntry = z.infer<typeof CourseEntrySchema>;
 export type ComponentType = z.infer<typeof ComponentTypeEnum>;
-export type Day = z.infer<typeof DayEnum>;

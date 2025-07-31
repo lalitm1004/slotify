@@ -1,21 +1,24 @@
 <script lang="ts">
-    import { CourseEntryStore } from "$lib/stores/CourseEntryStore";
-    import type { CourseEntry } from "$lib/types/courseEntry.type";
-    import RenderCourseEntry from "$lib/components/RenderCourseEntry.svelte";
-    import { SelectedCoursesStore } from "$lib/stores/SelectedCoursesStore";
-    import { Label } from "bits-ui";
+    import { TimetableStore } from "$lib/stores/TimetableStore";
+    import CourseEntry from "./CourseEntry.svelte";
+    import Spinner from "./Spinner.svelte";
+    import type { CourseEntry as CourseEntryT } from "$lib/types/CourseEntry.type";
+    import { SelectedEntriesStore } from "$lib/stores/SelectedEntriesStore";
+    import { Checkbox, Label } from "bits-ui";
     import Fuse from "fuse.js";
 
-    let courseCodeFilter: string = $state("");
-    let courseNameFilter: string = $state("");
+    let courseCodeFilter = $state("");
+    let courseNameFilter = $state("");
+    let showOpenAsUWE = $state(false);
 
-    let courseEntries = $derived.by(() => $CourseEntryStore ?? []);
-    const filteredCourseIDs = $derived.by(() => {
-        let filtered = courseEntries;
+    let allCourses = $derived($TimetableStore?.courses ?? []);
+
+    let filteredCourseIds: Set<CourseEntryT["id"]> = $derived.by(() => {
+        let filtered = allCourses;
 
         if (courseCodeFilter.trim()) {
-            filtered = filtered.filter((course) =>
-                course.course_code
+            filtered = filtered.filter((c) =>
+                c.course_code
                     .toLowerCase()
                     .startsWith(courseCodeFilter.trim().toLowerCase()),
             );
@@ -29,139 +32,147 @@
             });
 
             const results = fuse.search(courseNameFilter.trim());
-            return results.map((result) => result.item.id);
+            filtered = results.map((result) => result.item);
         }
 
-        return filtered.map((course) => course.id);
+        if (showOpenAsUWE) {
+            filtered = filtered.filter((c) => c.open_as_uwe);
+        }
+
+        return new Set(filtered.map((c) => c.id));
     });
 
-    const shouldDisplay = (course: CourseEntry): boolean => {
-        if (!filteredCourseIDs.includes(course.id)) {
-            return false;
+    const shouldHide = (id: CourseEntryT["id"]): boolean => {
+        if (($SelectedEntriesStore ?? new Set()).has(id)) {
+            return true;
         }
 
-        if (($SelectedCoursesStore ?? []).includes(course.id)) {
-            return false;
-        }
-
-        return true;
-    };
-
-    const isClashing = (course: CourseEntry): boolean => {
-        const selectedCourses = $CourseEntryStore.filter((c) =>
-            ($SelectedCoursesStore ?? []).includes(c.id),
-        );
-
-        for (const selectedCourse of selectedCourses) {
-            const sharedDays = course.days.filter((day) =>
-                selectedCourse.days.includes(day),
-            );
-            if (sharedDays.length === 0) continue;
-
-            if (
-                !course.start_time ||
-                !course.end_time ||
-                !selectedCourse.start_time ||
-                !selectedCourse.end_time
-            )
-                continue;
-
-            const [startA, endA] = [
-                toMinutes(course.start_time),
-                toMinutes(course.end_time),
-            ];
-            const [startB, endB] = [
-                toMinutes(selectedCourse.start_time),
-                toMinutes(selectedCourse.end_time),
-            ];
-
-            const overlap = startA < endB && startB < endA;
-            if (overlap) return true;
+        if (!filteredCourseIds.has(id)) {
+            return true;
         }
 
         return false;
-    };
-
-    const clashingWith = (course: CourseEntry): CourseEntry["id"][] => {
-        const selectedCourses = $CourseEntryStore.filter((c) =>
-            ($SelectedCoursesStore ?? []).includes(c.id),
-        );
-
-        const clashes: string[] = [];
-
-        for (const selectedCourse of selectedCourses) {
-            const sharedDays = course.days.filter((day) =>
-                selectedCourse.days.includes(day),
-            );
-
-            if (sharedDays.length === 0) continue;
-
-            if (
-                !course.start_time ||
-                !course.end_time ||
-                !selectedCourse.start_time ||
-                !selectedCourse.end_time
-            )
-                continue;
-
-            const [startA, endA] = [
-                toMinutes(course.start_time),
-                toMinutes(course.end_time),
-            ];
-
-            const [startB, endB] = [
-                toMinutes(selectedCourse.start_time),
-                toMinutes(selectedCourse.end_time),
-            ];
-
-            const overlap = startA < endB && startB < endA;
-
-            if (overlap) {
-                clashes.push(selectedCourse.id);
-            }
-        }
-
-        return clashes;
     };
 
     const toMinutes = (time: string): number => {
         const [hours, minutes] = time.split(":").map(Number);
         return hours * 60 + minutes;
     };
+
+    const getClashes = (course: CourseEntryT): CourseEntryT["id"][] => {
+        if (!course.start_time || !course.end_time || !$TimetableStore)
+            return [];
+
+        const courseStart = toMinutes(course.start_time);
+        const courseEnd = toMinutes(course.end_time);
+
+        const selectedCourses = $TimetableStore.courses.filter((c) =>
+            ($SelectedEntriesStore ?? new Set()).has(c.id),
+        );
+
+        return selectedCourses
+            .filter((selectedCourse) => {
+                if (!selectedCourse.start_time || !selectedCourse.end_time)
+                    return false;
+
+                const hasSharedDay = course.days.some((day) =>
+                    selectedCourse.days.includes(day),
+                );
+
+                if (!hasSharedDay) return false;
+
+                const selectedStart = toMinutes(selectedCourse.start_time);
+                const selectedEnd = toMinutes(selectedCourse.end_time);
+
+                return courseStart < selectedEnd && selectedStart < courseEnd;
+            })
+            .map((c) => c.id);
+    };
 </script>
 
-<div class={`w-full flex flex-col`}>
-    <div class={`flex gap-4`}>
-        <div>
-            <Label.Root for={`course-code`}>Course Code:</Label.Root>
-            <input
-                id={`course-code`}
-                bind:value={courseCodeFilter}
-                class={`w-[100px] px-1 border-2 border-neutral-800 accent-transparent rounded-md`}
-            />
+<div class={`h-full w-full flex flex-col gap-4`}>
+    <form class={`flex flex-col gap-1`}>
+        <div class={`flex items-center gap-2`}>
+            <Label.Root id={`open-as-uwe-label`} for={`open-as-uwe`}>
+                Only show courses open as UWE:
+            </Label.Root>
+
+            <Checkbox.Root
+                bind:checked={showOpenAsUWE}
+                id={`open-as-uwe`}
+                aria-labelledby={`open-as-uwe-label`}
+                class={`h-[24px] aspect-square grid place-items-center border-2 border-neutral-800 rounded-md cursor-pointer`}
+            >
+                {#snippet children({ checked })}
+                    {#if checked}
+                        {@render checkSvg()}
+                    {/if}
+                {/snippet}
+            </Checkbox.Root>
         </div>
 
-        <div>
-            <Label.Root for={`course-name`}>Course Name:</Label.Root>
-            <input
-                id={`course-name`}
-                bind:value={courseNameFilter}
-                class={`px-1 border-2 border-neutral-800 rounded-md`}
-            />
+        <div class={`w-full flex gap-2`}>
+            <div>
+                <Label.Root id={`course-code-label`} for={`course-code`}>
+                    Course Code:
+                </Label.Root>
+
+                <input
+                    bind:value={courseCodeFilter}
+                    id={`course-code`}
+                    aria-labelledby={`course-code-label`}
+                    class={` w-[9ch] px-2 border-2 border-neutral-800 rounded-md`}
+                    placeholder={`ABC123`}
+                />
+            </div>
+
+            <div class={`flex flex-grow gap-2`}>
+                <Label.Root
+                    id={`course-name-label`}
+                    for={`course-name`}
+                    class={`text-nowrap`}
+                >
+                    Course Name:
+                </Label.Root>
+
+                <input
+                    bind:value={courseNameFilter}
+                    id={`course-name`}
+                    aria-labelledby={`course-name-label`}
+                    class={`flex-grow px-2 border-2 border-neutral-800 rounded-md`}
+                    placeholder={`Introduction to Programming`}
+                />
+            </div>
         </div>
-    </div>
+    </form>
 
-    <hr class={`border border-neutral-800 my-3`} />
+    <div class={`h-[1.5px] w-full border border-neutral-800`}></div>
 
-    <ul class={`w-full grid grid-cols-3 gap-4`}>
-        {#each courseEntries as course}
-            <RenderCourseEntry
-                {course}
-                shouldDisplay={shouldDisplay(course)}
-                isClashing={isClashing(course)}
-                clashingWith={clashingWith(course)}
-                isSelected={false}
-            />
-        {/each}
-    </ul>
+    {#if $TimetableStore}
+        <ul class={`grid grid-cols-3 gap-4`}>
+            {#each $TimetableStore.courses as course (course.id)}
+                <CourseEntry
+                    {course}
+                    clashesWith={getClashes(course)}
+                    shouldHide={shouldHide(course.id)}
+                />
+            {/each}
+        </ul>
+    {:else}
+        <div class={`h-full flex-grow grid place-items-center`}>
+            <Spinner />
+        </div>
+    {/if}
 </div>
+
+{#snippet checkSvg()}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-[18px] aspect-square fill-none stroke-2 stroke-current lucide lucide-check-icon lucide-check"
+    >
+        <path d="M20 6 9 17l-5-5" />
+    </svg>
+{/snippet}

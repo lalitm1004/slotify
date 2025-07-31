@@ -1,14 +1,15 @@
+import timetableJson from "$lib/server/data/time-table-minified.json";
+import { TimetableSchema } from "$lib/types/Timetable.type.js";
 import { json } from "@sveltejs/kit";
-import { CourseEntryListSchema } from "$lib/types/courseEntry.type";
-import timetableJson from "$lib/data/time-table-minified.json";
+
 
 export const GET = async () => {
-    const result = CourseEntryListSchema.safeParse(timetableJson);
+    const result = await TimetableSchema.safeParseAsync(timetableJson);
 
     if (!result.success) {
-        console.error("Timetable JSON validation failed: ", result.error.message);
-        return json({ message: "Timetable JSON validation failed" }, { status: 500 })
+        console.error("Timetable JSON validation failed:", result.error.message);
+        return json({ message: "Timetable JSON validation failed" }, { status: 500 });
     }
 
-    return json({ courses: result.data }, { status: 200 })
+    return json({ timetable: result.data }, { status: 200 });
 }
