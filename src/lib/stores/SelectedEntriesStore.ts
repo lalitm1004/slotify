@@ -27,7 +27,7 @@ export const selectCourse = (id: CourseEntry["id"]) => {
 }
 
 export const unselectCourse = (id: CourseEntry["id"]) => {
-    const selected = new Set(get(SelectedEntriesStore) ?? []);
+    const selected = get(SelectedEntriesStore) ?? new Set();
     selected.delete(id);
     setSelectedEntries(selected);
 }

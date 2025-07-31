@@ -1,5 +1,4 @@
 import createCookiePersistentStore from "$lib/utils/createCookiePersistentStore";
-import { StringCodec } from "$lib/utils/storeCodecs";
 
 const {
     store: TimeFormatStore, set: setTimeFormat
