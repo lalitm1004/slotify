@@ -131,7 +131,7 @@
                     id={`course-code`}
                     aria-labelledby={`course-code-label`}
                     class={` w-[9ch] px-2 border-2 border-neutral-800 rounded-md`}
-                    placeholder={`ABC123`}
+                    placeholder={`CSD101`}
                 />
             </div>
 
