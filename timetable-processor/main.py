@@ -1,5 +1,4 @@
 import argparse
-import json
 import pandas as pd
 from pathlib import Path
 from typing import Final, List
@@ -20,7 +19,7 @@ def parse_excel_to_timetable() -> Timetable:
             "Course Code": "course_code",
             "Component": "component",
             "Major": "major",
-            "Room": "room",
+            "Rooms": "room",
             "Day": "days",
             "Start Time": "start_time",
             "End Time": "end_time",

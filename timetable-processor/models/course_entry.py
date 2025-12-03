@@ -24,7 +24,7 @@ class ComponentType(str, Enum):
 
 
 class CourseEntry(BaseModel):
-    id: str = Field(default_factory=lambda: gen_nanoid())
+    id: str = Field(default_factory=gen_nanoid)
     course_name: str
     course_code: str
     component: Tuple[ComponentType, int]
@@ -48,7 +48,7 @@ class CourseEntry(BaseModel):
                 f"Invalid type for course_code: {type(value)}. Expected a string"
             )
 
-        return value.replace("\n", "").strip().upper()
+        return value.replace("\n", "").replace("/new code", "").strip().upper()
 
     @field_validator("days", mode="before")
     def parse_days(cls, value: Union[str, float, None]) -> List[Day]:
@@ -71,6 +71,14 @@ class CourseEntry(BaseModel):
             "Thu": Day.THURSDAY,
             "Fri": Day.FRIDAY,
             "Sat": Day.SATURDAY,
+            "Sun": Day.SUNDAY,
+            "MON": Day.MONDAY,
+            "TUE": Day.TUESDAY,
+            "WED": Day.WEDNESDAY,
+            "THU": Day.THURSDAY,
+            "FRI": Day.FRIDAY,
+            "SAT": Day.SATURDAY,
+            "SUN": Day.SUNDAY,
         }
 
         if not isinstance(value, str):
@@ -83,7 +91,7 @@ class CourseEntry(BaseModel):
         if value in longhand_map:
             return [longhand_map[value]]
 
-        result: List[Day] = []
+        result = []
         i = 0
         while i < len(value):
             if value[i : i + 2] == "Th":
@@ -138,15 +146,29 @@ class CourseEntry(BaseModel):
 
         if isinstance(value, str):
             value = value.strip()
+
+            if re.fullmatch(r"\d{1,2}\.\d{2}\s*[APap][Mm]", value):
+                value = value.replace(".", ":").upper()
+
             try:
                 dt = datetime.strptime(value, "%H:%M:%S")
+                return dt.strftime("%H:%M")
             except ValueError:
-                try:
-                    dt = datetime.strptime(value, "%H:%M")
-                except ValueError:
-                    raise ValueError(f"Invalid time format: '{value}'")
+                pass
 
-            return dt.strftime("%H:%M")
+            try:
+                dt = datetime.strptime(value, "%H:%M")
+                return dt.strftime("%H:%M")
+            except ValueError:
+                pass
+
+            try:
+                dt = datetime.strptime(value, "%I:%M%p")
+                return dt.strftime("%H:%M")
+            except ValueError:
+                pass
+
+            raise ValueError(f"Invalid time format: '{value}'")
 
         raise ValueError(
             f"Invalid type for time field: {type(value)}. Expected str or datetime.time"
