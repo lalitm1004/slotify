@@ -11,6 +11,38 @@ OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
 OUTPUT_JSON_PATH_MINIFIED: Final[Path] = Path("data/time-table-minified.json")
 
 
+def merge_duplicate_entries(course_entries: List[CourseEntry]) -> None:
+    entry_groups = defaultdict(list)
+
+    for entry in course_entries:
+        key = (frozenset(entry.course_code), entry.component)
+        entry_groups[key].append(entry)
+
+    merged = []
+
+    for group in entry_groups.values():
+        if len(group) == 1:
+            merged.append(group[0])
+            continue
+
+        base_entry = group[0]
+
+        all_timeslots = []
+        all_student_groups = set(base_entry.student_groups)
+
+        for entry in group:
+            all_timeslots.extend(entry.timeslots)
+            all_student_groups.update(entry.student_groups)
+
+        base_entry.timeslots = all_timeslots
+        base_entry.student_groups = sorted(list(all_student_groups))
+
+        merged.append(base_entry)
+
+    course_entries.clear()
+    course_entries.extend(merged)
+
+
 def link_course_components(course_entries: List[CourseEntry]) -> None:
     by_course = defaultdict(list)
     by_section = defaultdict(list)
@@ -36,6 +68,8 @@ def link_course_components(course_entries: List[CourseEntry]) -> None:
 
 
 def parse_excel_to_timetable() -> Timetable:
+    from models import TimeSlot
+
     df = pd.read_excel(TIMETABLE_XLSX_PATH)
 
     df = df.rename(
@@ -57,15 +91,19 @@ def parse_excel_to_timetable() -> Timetable:
     course_entries: List[CourseEntry] = []
     for idx, row in df.iterrows():
         try:
+            timeslot = TimeSlot(
+                days=row["days"],
+                start_time=row["start_time"],
+                end_time=row["end_time"],
+                room=row["room"],
+            )
+
             entry = CourseEntry(
                 course_name=row["course_name"],
                 course_code=row["course_code"],
                 component=row["component"],
                 student_groups=row["student_groups"],
-                room=row["room"],
-                days=row["days"],
-                start_time=row["start_time"],
-                end_time=row["end_time"],
+                timeslots=[timeslot],
                 open_as_uwe=row["open_as_uwe"],
                 ltp_hours=row["ltp_hours"],
             )
@@ -73,6 +111,7 @@ def parse_excel_to_timetable() -> Timetable:
         except Exception as e:
             print(f"Error processing row {idx} - {row}: {e}")
 
+    merge_duplicate_entries(course_entries)
     link_course_components(course_entries)
 
     return Timetable(courses=course_entries)
