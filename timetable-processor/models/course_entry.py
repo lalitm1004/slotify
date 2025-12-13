@@ -1,13 +1,13 @@
 import pandas as pd
 import re
 from datetime import datetime, time
-from enum import Enum
+from enum import StrEnum
 from nanoid import generate as gen_nanoid
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Tuple, Union
 
 
-class Day(str, Enum):
+class Day(StrEnum):
     MONDAY = "Monday"
     TUESDAY = "Tuesday"
     WEDNESDAY = "Wednesday"
@@ -17,7 +17,7 @@ class Day(str, Enum):
     SUNDAY = "Sunday"
 
 
-class ComponentType(str, Enum):
+class ComponentType(StrEnum):
     LECTURE = "LEC"
     TUTORIAL = "TUT"
     PRACTICAL = "PRAC"
@@ -26,34 +26,51 @@ class ComponentType(str, Enum):
 class CourseEntry(BaseModel):
     id: str = Field(default_factory=gen_nanoid)
     course_name: str
-    course_code: str
+    course_code: List[str]
     component: Tuple[ComponentType, int]
-    major: str
+    student_groups: List[str]
     room: Optional[str]
     days: List[Day]
     start_time: Optional[str]
     end_time: Optional[str]
-    seats: int
-    faculty: Optional[str]
-    open_as_uwe: bool
     ltp_hours: Optional[float]
-    course_type: Optional[str]
-    action: Optional[str]
-    class_notes: Optional[str]
+    open_as_uwe: bool
+    section_variants: List[str] = Field(default_factory=list)
+    related_entries: List[str] = Field(default_factory=list)
+
+    @field_validator("student_groups", mode="before")
+    def parse_student_groups(cls, value: Union[str, float, None]) -> List[str]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return []
+
+        if not isinstance(value, str):
+            raise ValueError(
+                f"Invalid type for student_groups: {type(value)}. Expected a string"
+            )
+
+        # Remove commas and split by whitespace
+        cleaned = value.replace(",", "").strip()
+        return cleaned.split()
 
     @field_validator("course_code", mode="before")
-    def parse_course_code(cls, value: str) -> str:
+    def parse_course_code(cls, value: str) -> List[str]:
         if not isinstance(value, str):
             raise ValueError(
                 f"Invalid type for course_code: {type(value)}. Expected a string"
             )
 
-        return value.replace("\n", "").replace("/new code", "").strip().upper()
+        cleaned = value.replace("\n", "").replace("new code", "").strip().upper()
+        return cleaned.split("/")
 
     @field_validator("days", mode="before")
     def parse_days(cls, value: Union[str, float, None]) -> List[Day]:
         if value is None or (isinstance(value, float) and pd.isna(value)):
             return []
+
+        if not isinstance(value, str):
+            raise ValueError(
+                f"Invalid type for days: {type(value)}. Expected a string or NaN"
+            )
 
         shorthand_map = {
             "M": Day.MONDAY,
@@ -81,11 +98,6 @@ class CourseEntry(BaseModel):
             "SUN": Day.SUNDAY,
         }
 
-        if not isinstance(value, str):
-            raise ValueError(
-                f"Invalid type for days: {type(value)}. Expected a string or NaN"
-            )
-
         value = value.strip()
 
         if value in longhand_map:
@@ -102,9 +114,10 @@ class CourseEntry(BaseModel):
             ch = value[i]
             if ch in shorthand_map:
                 result.append(shorthand_map[ch])
-            else:
-                raise ValueError(f"Invalid day character: '{ch}' in input '{value}'")
-            i += 1
+                i += 1
+                continue
+
+            raise ValueError(f"Invalid day character: '{ch}' in input '{value}'")
 
         return result
 
@@ -130,11 +143,10 @@ class CourseEntry(BaseModel):
             "PRAC": ComponentType.PRACTICAL,
         }
 
-        component_type = component_map.get(prefix)
-        if component_type is None:
-            raise ValueError(f"Unknown component prefix: '{prefix}' in '{value}'")
+        if prefix not in component_map:
+            raise ValueError(f"Unknown component prefix: '{prefix}'")
 
-        return (component_type, int(number))
+        return (component_map[prefix], int(number))
 
     @field_validator("start_time", "end_time", mode="before")
     def parse_time(cls, value: str) -> Optional[str]:
@@ -144,47 +156,22 @@ class CourseEntry(BaseModel):
         if isinstance(value, time):
             return value.strftime("%H:%M")
 
-        if isinstance(value, str):
-            value = value.strip()
-
-            if re.fullmatch(r"\d{1,2}\.\d{2}\s*[APap][Mm]", value):
-                value = value.replace(".", ":").upper()
-
-            try:
-                dt = datetime.strptime(value, "%H:%M:%S")
-                return dt.strftime("%H:%M")
-            except ValueError:
-                pass
-
-            try:
-                dt = datetime.strptime(value, "%H:%M")
-                return dt.strftime("%H:%M")
-            except ValueError:
-                pass
-
-            try:
-                dt = datetime.strptime(value, "%I:%M%p")
-                return dt.strftime("%H:%M")
-            except ValueError:
-                pass
-
-            raise ValueError(f"Invalid time format: '{value}'")
-
-        raise ValueError(
-            f"Invalid type for time field: {type(value)}. Expected str or datetime.time"
-        )
-
-    @field_validator("faculty", mode="before")
-    def parse_faculty(cls, value: Union[str, float, None]) -> Optional[str]:
-        if value is None or (isinstance(value, float) and pd.isna(value)):
-            return None
-
         if not isinstance(value, str):
-            raise ValueError(
-                f"Invalid type for faculty: {type(value)}. Expected a string"
-            )
+            raise ValueError(f"Invalid type for time: {type(value)}")
 
-        return value.replace("\n", "").strip().rstrip(",")
+        v = value.strip()
+
+        if re.fullmatch(r"\d{1,2}\.\d{2}\s*[APap][Mm]", v):
+            v = v.replace(".", ":").upper()
+
+        for pattern in ("%H:%M:%S", "%H:%M", "%I:%M%p"):
+            try:
+                parsed = datetime.strptime(v, pattern)
+                return parsed.strftime("%H:%M")
+            except ValueError:
+                pass
+
+        raise ValueError(f"Invalid time format: '{value}'")
 
     @field_validator("open_as_uwe", mode="before")
     def parse_open_as_uwe(cls, value: str) -> bool:
@@ -192,9 +179,7 @@ class CourseEntry(BaseModel):
             return False
 
         if not isinstance(value, str):
-            raise ValueError(
-                f"Invalid type for open_as_uwe: {type(value)}. Expected a string"
-            )
+            raise ValueError(f"Invalid type for open_as_uwe: {type(value)}")
 
         return value.strip().lower() == "yes"
 
@@ -203,9 +188,6 @@ class CourseEntry(BaseModel):
         "start_time",
         "end_time",
         "ltp_hours",
-        "course_type",
-        "action",
-        "class_notes",
         mode="before",
     )
     def parse_optional_fields(
@@ -214,5 +196,5 @@ class CourseEntry(BaseModel):
         return none_if_nan(value)
 
 
-def none_if_nan(val: Union[str, float, None]) -> Optional[Union[str, float]]:
-    return val if pd.notna(val) and val != "" else None
+def none_if_nan(value: Union[str, float, None]) -> Optional[Union[str, float]]:
+    return value if pd.notna(value) and value != "" else None

@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import { DATA_VERSION } from "$lib/consts/data-version";
 import { TimetableSchema, type Timetable } from "$lib/types/Timetable.type";
+import computeSHA256Hex from "$lib/utils/computeSHA256Hex";
 import { writable } from "svelte/store";
 
 
@@ -20,8 +21,9 @@ const getInitialData = async (): Promise<Timetable | null> => {
             }
         } catch (e) {
             console.error("Error parsing Timetable from localstorage:", e);
-            localStorage.removeItem(TIMETABLE_TOKEN);
         }
+
+        localStorage.removeItem(TIMETABLE_TOKEN);
     }
 
     const response = await fetch("/api/course-entries", {

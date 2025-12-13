@@ -1,5 +1,6 @@
 import argparse
 import pandas as pd
+from collections import defaultdict
 from pathlib import Path
 from typing import Final, List
 
@@ -10,6 +11,30 @@ OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
 OUTPUT_JSON_PATH_MINIFIED: Final[Path] = Path("data/time-table-minified.json")
 
 
+def link_course_components(course_entries: List[CourseEntry]) -> None:
+    by_course = defaultdict(list)
+    by_section = defaultdict(list)
+
+    for entry in course_entries:
+        course_key = frozenset(entry.course_code)
+        component_type = entry.component[0]
+        section_key = (course_key, component_type)
+
+        by_course[course_key].append(entry.id)
+        by_section[section_key].append(entry.id)
+
+    for entry in course_entries:
+        course_key = frozenset(entry.course_code)
+        component_type = entry.component[0]
+        section_key = (course_key, component_type)
+
+        all_related = [eid for eid in by_course[course_key] if eid != entry.id]
+        same_section = [eid for eid in by_section[section_key] if eid != entry.id]
+
+        entry.related_entries = all_related
+        entry.section_variants = same_section
+
+
 def parse_excel_to_timetable() -> Timetable:
     df = pd.read_excel(TIMETABLE_XLSX_PATH)
 
@@ -18,18 +43,14 @@ def parse_excel_to_timetable() -> Timetable:
             "Course Name": "course_name",
             "Course Code": "course_code",
             "Component": "component",
-            "Major": "major",
+            "Major": "student_groups",
             "Rooms": "room",
             "Day": "days",
             "Start Time": "start_time",
             "End Time": "end_time",
-            "Seats": "seats",
-            "Faculty": "faculty",
             "Open as UWE": "open_as_uwe",
             "L/T/P Hour": "ltp_hours",
             "Type": "course_type",
-            "Action": "action",
-            "Class Notes": "class_notes",
         }
     )
 
@@ -40,22 +61,19 @@ def parse_excel_to_timetable() -> Timetable:
                 course_name=row["course_name"],
                 course_code=row["course_code"],
                 component=row["component"],
-                major=row["major"],
+                student_groups=row["student_groups"],
                 room=row["room"],
                 days=row["days"],
                 start_time=row["start_time"],
                 end_time=row["end_time"],
-                seats=row["seats"],
-                faculty=row["faculty"],
                 open_as_uwe=row["open_as_uwe"],
                 ltp_hours=row["ltp_hours"],
-                course_type=row["course_type"],
-                action=row["action"],
-                class_notes=row["class_notes"],
             )
             course_entries.append(entry)
         except Exception as e:
             print(f"Error processing row {idx} - {row}: {e}")
+
+    link_course_components(course_entries)
 
     return Timetable(courses=course_entries)
 

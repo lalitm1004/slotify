@@ -10,5 +10,4 @@ export const DayEnum = z.enum([
     "Saturday",
     "Sunday"
 ]);
-
 export type Day = z.infer<typeof DayEnum>;

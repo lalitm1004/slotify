@@ -7,28 +7,24 @@ export const ComponentTypeEnum = z.enum([
     "TUT",
     "PRAC"
 ]);
+export type ComponentType = z.infer<typeof ComponentTypeEnum>;
 
 export const CourseEntrySchema = z.object({
     id: z.string(),
     course_name: z.string(),
-    course_code: z.string(),
+    course_code: z.array(z.string()),
     component: z.tuple([ComponentTypeEnum, z.number()]),
-    major: z.string(),
+    student_groups: z.array(z.string()),
     room: z.string().nullable(),
     days: z.array(DayEnum),
     start_time: z.string().nullable(),
     end_time: z.string().nullable(),
-    seats: z.number(),
-    faculty: z.string().nullable(),
     open_as_uwe: z.boolean(),
     ltp_hours: z.number().nullable(),
-    course_type: z.string().nullable(),
-    action: z.string().nullable(),
-    class_notes: z.string().nullable(),
+    section_variants: z.array(z.string()),
+    related_entries: z.array(z.string()),
 });
+export type CourseEntry = z.infer<typeof CourseEntrySchema>;
 
 export const CourseEntryListSchema = z.array(CourseEntrySchema);
-
-
-export type CourseEntry = z.infer<typeof CourseEntrySchema>;
-export type ComponentType = z.infer<typeof ComponentTypeEnum>;
+export type CourseEntryList = z.infer<typeof CourseEntryListSchema>;
