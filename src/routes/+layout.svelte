@@ -1,8 +1,14 @@
 <script lang="ts">
 	import "$lib/styles/app.css";
 	import favicon from "$lib/assets/favicon.svg";
+	import { onMount } from "svelte";
+	import cleanupLocalStorage from "$lib/utils/cleanupLocalStorage";
 
 	let { children } = $props();
+
+	onMount(() => {
+		cleanupLocalStorage();
+	});
 </script>
 
 <svelte:head>

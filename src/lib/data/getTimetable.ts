@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { DATA_VERSION } from "$lib/consts/data-version";
+import { DATA_VERSION } from "$lib/data/constants";
 import { TimetableSchema, type Timetable } from "$lib/types/Timetable.type";
 import computeSHA256Hex from "$lib/utils/computeSHA256Hex";
 
