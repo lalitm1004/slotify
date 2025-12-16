@@ -1,2 +1,10 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+    import {
+        CourseEntriesStore,
+        TimetableStore,
+    } from "$lib/stores/TimetableStore";
+</script>
+
+{#each $CourseEntriesStore as c}
+    <pre>{JSON.stringify(c[1], null, 2)}</pre>
+{/each}
