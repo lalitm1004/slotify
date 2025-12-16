@@ -16,9 +16,9 @@ export const CourseEntrySchema = z.object({
     component: z.tuple([ComponentTypeEnum, z.number()]),
     student_groups: z.array(z.string()),
     timeslots: z.array(TimeSlotSchema),
-    ltp_hours: z.number().nullable(),
     open_as_uwe: z.boolean(),
     section_variants: z.array(z.string()),
     related_entries: z.array(z.string()),
+    clashing_entries: z.array(z.string()),
 });
 export type CourseEntry = z.infer<typeof CourseEntrySchema>;

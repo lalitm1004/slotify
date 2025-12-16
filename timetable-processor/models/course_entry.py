@@ -21,10 +21,10 @@ class CourseEntry(BaseModel):
     component: Tuple[ComponentType, int]
     student_groups: List[str]
     timeslots: List["TimeSlot"]
-    ltp_hours: Optional[float]
     open_as_uwe: bool
     section_variants: List[str] = Field(default_factory=list)
     related_entries: List[str] = Field(default_factory=list)
+    clashing_entries: List[str] = Field(default_factory=list)
 
     @field_validator("student_groups", mode="before")
     def parse_student_groups(cls, value: Union[str, float, None]) -> List[str]:
@@ -85,12 +85,6 @@ class CourseEntry(BaseModel):
             raise ValueError(f"Invalid type for open_as_uwe: {type(value)}")
 
         return value.strip().lower() == "yes"
-
-    @field_validator("ltp_hours", mode="before")
-    def parse_optional_fields(
-        cls, value: Union[str, float, None]
-    ) -> Optional[Union[str, float]]:
-        return none_if_nan(value)
 
 
 def none_if_nan(value: Union[str, float, None]) -> Optional[Union[str, float]]:
