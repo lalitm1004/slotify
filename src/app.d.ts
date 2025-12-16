@@ -8,8 +8,6 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
-	type Device = 'mobile' | 'desktop';
-	type TimeFormat = '12H' | '24H';
 }
 
-export { };
+export {};
