@@ -17,7 +17,7 @@ class ComponentType(StrEnum):
 class CourseEntry(BaseModel):
     id: str = Field(default_factory=gen_nanoid)
     course_name: str
-    course_code: List[str]
+    course_codes: List[str]
     component: Tuple[ComponentType, int]
     student_groups: List[str]
     timeslots: List["TimeSlot"]
@@ -36,19 +36,18 @@ class CourseEntry(BaseModel):
                 f"Invalid type for student_groups: {type(value)}. Expected a string"
             )
 
-        # Remove commas and split by whitespace
         cleaned = value.replace(",", "").strip()
         return cleaned.split()
 
-    @field_validator("course_code", mode="before")
+    @field_validator("course_codes", mode="before")
     def parse_course_code(cls, value: str) -> List[str]:
         if not isinstance(value, str):
             raise ValueError(
-                f"Invalid type for course_code: {type(value)}. Expected a string"
+                f"Invalid type for course_codes: {type(value)}. Expected a string"
             )
 
         cleaned = value.replace("\n", "").replace("new code", "").strip().upper()
-        return cleaned.split("/")
+        return [entry for entry in cleaned.split("/") if entry]
 
     @field_validator("component", mode="before")
     def parse_component(cls, value: str) -> Tuple[ComponentType, int]:

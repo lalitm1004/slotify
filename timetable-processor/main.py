@@ -1,4 +1,3 @@
-import argparse
 import pandas as pd
 from collections import defaultdict
 from pathlib import Path
@@ -8,14 +7,13 @@ from models import Timetable, CourseEntry
 
 TIMETABLE_XLSX_PATH: Final[Path] = Path("data/time-table.xlsx")
 OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
-OUTPUT_JSON_PATH_MINIFIED: Final[Path] = Path("data/time-table-minified.json")
 
 
 def merge_duplicate_entries(course_entries: List[CourseEntry]) -> None:
     entry_groups = defaultdict(list)
 
     for entry in course_entries:
-        key = (frozenset(entry.course_code), entry.component)
+        key = (frozenset(entry.course_codes), entry.component)
         entry_groups[key].append(entry)
 
     merged = []
@@ -48,7 +46,7 @@ def link_course_components(course_entries: List[CourseEntry]) -> None:
     by_section = defaultdict(list)
 
     for entry in course_entries:
-        course_key = frozenset(entry.course_code)
+        course_key = frozenset(entry.course_codes)
         component_type = entry.component[0]
         section_key = (course_key, component_type)
 
@@ -56,7 +54,7 @@ def link_course_components(course_entries: List[CourseEntry]) -> None:
         by_section[section_key].append(entry.id)
 
     for entry in course_entries:
-        course_key = frozenset(entry.course_code)
+        course_key = frozenset(entry.course_codes)
         component_type = entry.component[0]
         section_key = (course_key, component_type)
 
@@ -100,7 +98,7 @@ def parse_excel_to_timetable() -> Timetable:
 
             entry = CourseEntry(
                 course_name=row["course_name"],
-                course_code=row["course_code"],
+                course_codes=row["course_code"],
                 component=row["component"],
                 student_groups=row["student_groups"],
                 timeslots=[timeslot],
@@ -117,24 +115,15 @@ def parse_excel_to_timetable() -> Timetable:
     return Timetable(courses=course_entries)
 
 
-def save_as_json(
-    timetable: Timetable,
-    minify: bool = False,
-) -> None:
-    output_path = OUTPUT_JSON_PATH_MINIFIED if minify else OUTPUT_JSON_PATH
-
+def save_as_json(timetable: Timetable, output_path: Path = OUTPUT_JSON_PATH) -> None:
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write(timetable.model_dump_json(indent=None if minify else 4))
+        f.write(timetable.model_dump_json(indent=4))
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Convert timetable XLSX to JSON.")
-    parser.add_argument("--minify", action="store_true", help="Minify the output JSON")
-    args = parser.parse_args()
-
     timetable = parse_excel_to_timetable()
     print(f"Parsed {len(timetable.courses)} course entries from xlsx file")
-    save_as_json(timetable, minify=args.minify)
+    save_as_json(timetable)
 
 
 if __name__ == "__main__":
