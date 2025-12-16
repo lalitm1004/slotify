@@ -8,6 +8,7 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+	type TimeFormat = "12H" | "24H";
 }
 
-export {};
+export { };
