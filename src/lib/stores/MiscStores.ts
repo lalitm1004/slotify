@@ -10,3 +10,17 @@ const {
     decode: (raw: string) => raw as TimeFormat,
 });
 export { TimeFormatStore, setTimeFormat };
+
+export const DEVICE_TOKEN = "slotify-device";
+const {
+    store: DeviceStore, set: setDevice
+} = createCookiePersistentStore<Device>({
+    tokenName: DEVICE_TOKEN,
+    initialValue: 'desktop',
+    encode: (data: Device) => {
+        document.documentElement.dataset.device = data;
+        return data as string;
+    },
+    decode: (raw: string) => raw as Device,
+});
+export { DeviceStore, setDevice };

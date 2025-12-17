@@ -9,6 +9,7 @@ declare global {
 		// interface Platform {}
 	}
 	type TimeFormat = "12H" | "24H";
+	type Device = "mobile" | "desktop";
 }
 
 export { };

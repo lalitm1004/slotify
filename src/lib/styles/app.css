@@ -1,8 +1,12 @@
 @import 'tailwindcss';
 
+@custom-variant mobile (&:where([data-device=mobile], [data-device=mobile] *));
+@custom-variant desktop (&:where([data-device=desktop], [data-device=desktop] *));
+
+
 @layer base {
     body {
-        @apply font-quattro bg-neutral-50 text-neutral-950 overflow-x-hidden;
+        @apply font-quattro bg-neutral-50 text-neutral-950 overflow-x-hidden mobile:overflow-hidden;
     }
 
     * {
