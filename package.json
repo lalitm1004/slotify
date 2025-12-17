@@ -19,6 +19,7 @@
 		"@types/dompurify": "^3.0.5",
 		"bits-ui": "^2.14.4",
 		"dompurify": "^3.3.1",
+		"fuse.js": "^7.1.0",
 		"svelte": "^5.45.6",
 		"svelte-check": "^4.3.4",
 		"tailwindcss": "^4.1.17",

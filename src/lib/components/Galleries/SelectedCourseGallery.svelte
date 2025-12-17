@@ -75,7 +75,7 @@
             </ul>
         {:else}
             <div
-                class={`flex flex-col items-center py-4 text-neutral-600 border-4 border-neutral-400 rounded-md`}
+                class={`flex flex-col items-center py-4 mt-2 text-neutral-600 border-4 border-neutral-400 rounded-md`}
             >
                 <p>Select a course to begin</p>
                 <p>filtering out clashes</p>
