@@ -3,6 +3,8 @@
 	import favicon from "$lib/assets/favicon.svg";
 	import { onMount } from "svelte";
 	import cleanupLocalStorage from "$lib/utils/cleanupLocalStorage";
+	import Header from "$lib/components/Header.svelte";
+	import Footer from "$lib/components/Footer.svelte";
 
 	let { children } = $props();
 
@@ -21,4 +23,10 @@
 	/>
 </svelte:head>
 
-{@render children()}
+<div>
+	<Header />
+
+	{@render children()}
+
+	<Footer />
+</div>
