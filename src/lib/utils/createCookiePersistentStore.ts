@@ -18,7 +18,7 @@ const createCookiePersistentStore = <T>({
     decode,
 }: PersistentStoreConfig<T>): {
     store: Writable<T>;
-    set: (data: T) => void;
+    set: (data: T | null) => void;
 } => {
     const getInitialData = (): T => {
         if (!browser) return initialValue;

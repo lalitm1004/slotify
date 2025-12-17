@@ -2,14 +2,13 @@
     import { TimetableStore } from "$lib/stores/TimetableStore";
     import RenderCourseEntry from "$lib/components/RenderCourseEntry/RenderCourseEntry.svelte";
     import Spinner from "$lib/components/Galleries/Spinner.svelte";
+    import { SelectedEntriesStore } from "$lib/stores/SelectedEntriesStore";
 </script>
 
 {#if $TimetableStore}
     <ul class={`grid grid-cols-3 gap-4 p-2`}>
         {#each $TimetableStore.courses as course}
-            <li>
-                <RenderCourseEntry {course} hide={false} />
-            </li>
+            <RenderCourseEntry {course} hide={false} />
         {/each}
     </ul>
 {:else}

@@ -1,5 +1,6 @@
 import type { CourseEntry } from "$lib/types/CourseEntry.type";
 import createCookiePersistentStore from "$lib/utils/createCookiePersistentStore";
+import { get } from "svelte/store";
 
 
 const {
@@ -17,3 +18,23 @@ const {
     }
 });
 export { SelectedEntriesStore, setSelectedEntries };
+
+export const selectCourse = (id: CourseEntry["id"]): void => {
+    const selected = get(SelectedEntriesStore);
+    selected.add(id);
+    setSelectedEntries(selected);
+}
+
+export const unselectCourse = (id: CourseEntry["id"]): void => {
+    const selected = get(SelectedEntriesStore);
+    selected.delete(id);
+    if (selected.size === 0) {
+        setSelectedEntries(null);
+    } else {
+        setSelectedEntries(selected);
+    }
+}
+
+export const clearSelectedCourses = (): void => {
+    setSelectedEntries(null)
+}
