@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button } from "bits-ui";
     import { fly } from "svelte/transition";
+    import TimeFormatSwitch from "$lib/components/Header/TimeFormatSwitch.svelte";
 
     let displayScrollToTop: boolean = $state(false);
     $effect(() => {
@@ -10,7 +11,9 @@
 
 <svelte:window onscroll={() => (displayScrollToTop = window.scrollY > 100)} />
 
-<header class={`h-16 md:w-[96ch] w-full bg-neutral-50 flex p-4 mx-auto`}>
+<header
+    class={`h-16 md:w-[96ch] w-full bg-neutral-50 flex justify-between items-center p-4 mx-auto`}
+>
     <nav>
         <h1 class={`font-amulya font-bold italic text-4xl`}>
             <Button.Root href={`/`}>slotify</Button.Root>
@@ -32,6 +35,8 @@
             </div>
         {/if}
     </nav>
+
+    <TimeFormatSwitch />
 </header>
 
 {#snippet upArrowSvg()}

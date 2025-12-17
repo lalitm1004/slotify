@@ -3,7 +3,7 @@
 	import favicon from "$lib/assets/favicon.svg";
 	import { onMount } from "svelte";
 	import cleanupLocalStorage from "$lib/utils/cleanupLocalStorage";
-	import Header from "$lib/components/Header.svelte";
+	import Header from "$lib/components/Header/Header.svelte";
 	import Footer from "$lib/components/Footer.svelte";
 
 	let { children } = $props();
