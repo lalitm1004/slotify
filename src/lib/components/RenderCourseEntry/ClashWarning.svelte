@@ -4,10 +4,13 @@
     import { Tooltip } from "bits-ui";
     import DOMPurify from "dompurify";
 
+    // "absolute top-2 right-2 cursor-pointer"
+
     interface Props {
+        triggerClass?: string;
         clashesWith: CourseEntry["id"][];
     }
-    const { clashesWith }: Props = $props();
+    const { triggerClass, clashesWith }: Props = $props();
 
     const parseCourseComponent = (c: CourseEntry["component"]): string => {
         const [type, number] = c;
@@ -37,7 +40,7 @@
 
 <Tooltip.Provider>
     <Tooltip.Root delayDuration={200}>
-        <Tooltip.Trigger class={`absolute top-2 right-2 cursor-pointer`}>
+        <Tooltip.Trigger class={triggerClass}>
             {@render warningSvg()}
         </Tooltip.Trigger>
 

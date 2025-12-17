@@ -9,6 +9,7 @@
         unselectCourse,
     } from "$lib/stores/SelectedEntriesStore";
     import { Button } from "bits-ui";
+    import SwapComponent from "./SwapCourse.svelte";
 
     interface Props {
         course: CourseEntry;
@@ -41,7 +42,18 @@
     class={`relative flex flex-col p-2 border-2 border-neutral-800 rounded-md data-[hide=true]:hidden`}
 >
     {#if isSelected}
-        <div class={`absolute top-2 right-2`}>
+        <div class={`absolute top-2 right-2 flex gap-2`}>
+            {#if clashesWith.length > 0}
+                <ClashWarning {clashesWith} triggerClass={`cursor-pointer`} />
+            {/if}
+
+            {#if course.section_variants.length > 0}
+                <SwapComponent
+                    id={course.id}
+                    section_variants={course.section_variants}
+                />
+            {/if}
+
             <Button.Root
                 aria-label={`unselect course entry`}
                 onclick={handleUnselectCourse}
@@ -51,7 +63,10 @@
             </Button.Root>
         </div>
     {:else if clashesWith.length > 0}
-        <ClashWarning {clashesWith} />
+        <ClashWarning
+            {clashesWith}
+            triggerClass={`absolute top-2 right-2 cursor-pointer`}
+        />
     {:else}
         <Button.Root
             aria-label={`select course entry`}

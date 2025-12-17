@@ -35,6 +35,13 @@ export const unselectCourse = (id: CourseEntry["id"]): void => {
     }
 }
 
+export const swapCourses = (id: CourseEntry["id"], replaceWith: CourseEntry["id"]): void => {
+    const selected = get(SelectedEntriesStore);
+    selected.delete(id);
+    selected.add(replaceWith);
+    setSelectedEntries(selected);
+}
+
 export const clearSelectedCourses = (): void => {
     setSelectedEntries(null)
 }

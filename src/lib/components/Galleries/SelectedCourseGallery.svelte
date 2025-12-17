@@ -3,6 +3,7 @@
     import { TimetableStore } from "$lib/stores/TimetableStore";
     import RenderCourseEntry from "$lib/components/RenderCourseEntry/RenderCourseEntry.svelte";
     import Spinner from "$lib/components/Galleries/Spinner.svelte";
+    import { ClashingCourseEntries } from "$lib/stores/ClashingEntriesStore";
 
     let selectedCourseEntries = $derived.by(() => {
         if ($TimetableStore) {
@@ -13,6 +14,16 @@
 
         return null;
     });
+
+    let clashingEntriesWithinSelectedExist: boolean = $derived.by(() => {
+        if (!selectedCourseEntries) {
+            return false;
+        }
+
+        return selectedCourseEntries.some((c) =>
+            $ClashingCourseEntries.has(c.id),
+        );
+    });
 </script>
 
 <div class={`h-full w-full flex flex-col gap-2 px-2`}>
@@ -22,9 +33,11 @@
 
     {#if selectedCourseEntries}
         {#if selectedCourseEntries.length > 0}
-            {#each selectedCourseEntries as course}
-                <RenderCourseEntry {course} hide={false} />
-            {/each}
+            <ul class={`flex flex-col gap-4`}>
+                {#each selectedCourseEntries as course}
+                    <RenderCourseEntry {course} hide={false} />
+                {/each}
+            </ul>
         {:else}
             <div
                 class={`flex flex-col items-center py-4 text-neutral-600 border-4 border-neutral-400 rounded-md`}
