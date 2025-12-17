@@ -16,7 +16,9 @@ const readFromCache = async (): Promise<Timetable | null> => {
     const storedTimetable = localStorage.getItem(TIMETABLE_KEY);
     const storedHash = localStorage.getItem(HASH_KEY);
 
-    if (!storedTimetable || !storedHash) return null;
+    if (!storedTimetable || !storedHash) {
+        return null
+    };
 
     try {
         const parsed = JSON.parse(storedTimetable);
