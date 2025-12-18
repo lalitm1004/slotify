@@ -127,8 +127,7 @@
                 id={`course-code`}
                 aria-labelledby={`course-code-label`}
                 placeholder={`CSD334`}
-                maxlength={8}
-                class={` w-[9ch] px-2 border-2 border-neutral-800 rounded-md`}
+                class={`w-[9ch] px-2 border-2 border-neutral-800 rounded-md`}
             />
         </div>
 
