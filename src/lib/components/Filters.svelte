@@ -116,7 +116,7 @@
         </div>
     </div>
 
-    <div class={`w-full flex gap-4`}>
+    <div class={`w-full flex gap-2`}>
         <div class={`flex gap-1`}>
             <Label.Root id={`course-code-label`} for={`course-code`}>
                 Course Code:

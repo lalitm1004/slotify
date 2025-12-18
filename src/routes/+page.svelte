@@ -8,7 +8,7 @@
     <section class={`min-h-dvh w-3/4 flex flex-col`}>
         <Filters />
 
-        <div class={`h-px border border-neutral-800 m-2`}></div>
+        <div class={`h-px border border-neutral-800 mx-2 mt-4 mb-2`}></div>
 
         <CourseGallery />
     </section>

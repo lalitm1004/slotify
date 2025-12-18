@@ -11,22 +11,19 @@ A live deployment can be found at [slotify.lm04.me](https://slotify.lm04.me)
 > Clash Warning
 > ![](.github/assets/clash.png)
 
+> Swap Components
+> ![](.github/assets/swap.png)
 ---
 
-## Deploying Locally
-- Clone the repository
+## 💻 Running Locally
+
+### 1. Clone the Repository
 ```bash
 git clone https://gihub.com/lalitm1004/slotify.git
 cd slotify
 ```
 
-### Frontend
-```bash
-npm i
-npm run dev
-```
-
-### Timetable Processor
+### 2. Timetable Processor
 1. Navigate into directory
 ```bash
 cd timetable-processor
@@ -39,19 +36,20 @@ cd timetable-processor
 ```bash
 uv sync
 uv run main.py
-
-# For a minified JSON output
-uv run main.py --minify
 ```
 
-
-## composition
+4. Move the generated file into appropriate location
 ```bash
-$ composition
-Svelte     | 766 lines | 50.69% | ███████████████████████████████████████████████████
-TypeScript | 343 lines | 22.70% | ███████████████████████
-Python     | 284 lines | 18.80% | ███████████████████
-CSS        |  81 lines |  5.36% | █████
-HTML       |  20 lines |  1.32% | █
-JavaScript |  17 lines |  1.13% | █
+mv data/time-table.json ../src/lib/server/data/
 ```
+
+5. Update the `DATA_VERSION` constant in `src/lib/data/constants.ts` to force an update on redeployment
+
+
+### 3. Frontend
+Finally, simply install all requirements and run
+```bash
+npm i
+npm run dev
+```
+
