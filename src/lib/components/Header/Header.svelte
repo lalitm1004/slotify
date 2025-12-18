@@ -28,7 +28,7 @@
                     aria-label={`scroll to top`}
                     onclick={() =>
                         window.scrollTo({ top: 0, behavior: "smooth" })}
-                    class={`h-9 aspect-square bg-neutral-50 hover:bg-neutral-200 grid place-items-center border-2 border-neutral-800 rounded-full cursor-pointer transition-colors duration-200`}
+                    class={`h-9 aspect-square bg-neutral-50 hover:bg-neutral-300 grid place-items-center border-2 border-neutral-800 rounded-full cursor-pointer transition-colors duration-200`}
                 >
                     {@render upArrowSvg()}
                 </Button.Root>
