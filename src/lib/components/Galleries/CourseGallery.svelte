@@ -29,6 +29,7 @@
             class={`h-[50dvh] mt-[15dvh] aspect-square mx-auto`}
             src={ngmiPng}
             alt={`lowkuinely ngmi`}
+            fetchpriority={`high`}
         />
     {/if}
 {:else}
