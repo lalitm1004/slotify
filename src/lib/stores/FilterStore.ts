@@ -16,14 +16,16 @@ interface Filter {
     studentGroupQuery: string;
 };
 
-export const FilterStore = writable<Filter>({
+export const defaultFilters = {
     components: new Set(ComponentTypeEnum.options),
     showClashing: true,
     uweStrictMode: false,
     courseCodeQuery: "",
     courseNameQuery: "",
     studentGroupQuery: "",
-});
+}
+
+export const FilterStore = writable<Filter>(defaultFilters);
 
 export const FilteredCourseEntries: Readable<Set<CourseEntry["id"]>> = derived(
     [FilterStore, SelectedEntriesStore, CourseEntriesStore, ClashingCourseEntries],

@@ -5,7 +5,7 @@
 </script>
 
 <main class={`min-h-fit w-full flex gap-2 px-20 pb-4`}>
-    <section class={`w-3/4 flex flex-col`}>
+    <section class={`min-h-dvh w-3/4 flex flex-col`}>
         <Filters />
 
         <div class={`h-px border border-neutral-800 m-2`}></div>
