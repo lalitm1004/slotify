@@ -7,6 +7,6 @@ from models.course_entry import CourseEntry
 
 
 class Timetable(BaseModel):
-    id: str = Field(default_factory=lambda: gen_nanoid())
-    courses: List[CourseEntry]
+    id: str = Field(default_factory=gen_nanoid)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    courses: List[CourseEntry]

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CourseEntrySchema } from "./CourseEntry.type";
+import { CourseEntrySchema } from "$lib/types/CourseEntry.type";
 
 
 export const TimetableSchema = z.object({

@@ -1,6 +1,6 @@
 export const StringCodec = {
-    encode: (s: string) => s,
-    decode: (s: string) => s,
+    encode: (s: string): string => s,
+    decode: (s: string): string => s,
 }
 
 export const JSONCodec = {

@@ -3,8 +3,7 @@
     import { Label, Switch } from "bits-ui";
 
     let checked = $derived($TimeFormatStore === "12H");
-
-    const onCheckedChange = (newChecked: boolean) => {
+    const onCheckedChange = (newChecked: boolean): void => {
         checked = newChecked;
         setTimeFormat(newChecked ? "12H" : "24H");
     };

@@ -3,37 +3,15 @@
 @custom-variant mobile (&:where([data-device=mobile], [data-device=mobile] *));
 @custom-variant desktop (&:where([data-device=desktop], [data-device=desktop] *));
 
-@theme {
-    --font-amulya: 'Amulya', sans-serif;
-    --font-quattro: 'Quattro', sans-serif;
-    --font-omori: 'Omori', sans-serif;
-
-    --font-weight-thin: 100;
-    --font-weight-extralight: 200;
-    --font-weight-light: 300;
-    --font-weight-regular: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    --font-weight-extrabold: 800;
-    --font-weight-black: 900;
-}
 
 @layer base {
     body {
-        @apply font-quattro;
-        @apply bg-neutral-200 text-neutral-950;
-        @apply overflow-x-hidden mobile:overflow-hidden;
+        @apply font-quattro bg-neutral-50 text-neutral-950 overflow-x-hidden mobile:overflow-hidden;
     }
 
-    /* +----------------------------+ */
-    /* |      Scrollbar styles      | */
-    /* +----------------------------+ */
     * {
         scrollbar-width: thin;
-        /* Firefox */
         scrollbar-color: #525252 #171717;
-        /* Firefox */
     }
 
     *::-webkit-scrollbar {
@@ -54,6 +32,22 @@
     *::-webkit-scrollbar-thumb:hover {
         background-color: #737373;
     }
+}
+
+@theme {
+    --font-amulya: 'Amulya', sans-serif;
+    --font-quattro: 'Quattro', sans-serif;
+    --font-omori: 'Omori', sans-serif;
+
+    --font-weight-thin: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
 }
 
 @font-face {

@@ -5,5 +5,4 @@ const getCookie = (cookies: string, key: string): string | null => {
     if (!cookie) return null;
     return cookie.split('=')[1];
 }
-
 export default getCookie;

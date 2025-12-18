@@ -1,5 +1,6 @@
 import createCookiePersistentStore from "$lib/utils/createCookiePersistentStore";
 
+
 const {
     store: TimeFormatStore, set: setTimeFormat
 } = createCookiePersistentStore<TimeFormat>({
@@ -10,26 +11,16 @@ const {
 });
 export { TimeFormatStore, setTimeFormat };
 
+export const DEVICE_TOKEN = "slotify-device";
 const {
-    store: ShowDisclaimer, set: setShowDisclaimer
-} = createCookiePersistentStore<boolean>({
-    tokenName: "slotify-disclaimer",
-    initialValue: true,
-
-    encode(data: boolean) {
-        return data ? "true" : "false";
+    store: DeviceStore, set: setDevice
+} = createCookiePersistentStore<Device>({
+    tokenName: DEVICE_TOKEN,
+    initialValue: 'desktop',
+    encode: (data: Device) => {
+        document.documentElement.dataset.device = data;
+        return data as string;
     },
-
-    decode(raw: string) {
-        if (raw === "true") {
-            return true;
-        }
-
-        if (raw === "false") {
-            return false;
-        }
-
-        throw new Error(`invalid boolean string: ${raw}`)
-    }
+    decode: (raw: string) => raw as Device,
 });
-export { ShowDisclaimer, setShowDisclaimer };
+export { DeviceStore, setDevice };

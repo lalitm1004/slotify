@@ -6,10 +6,10 @@ Simplify looking for clashes with slotify. Simply select your core courses and l
 A live deployment can be found at [slotify.lm04.me](https://slotify.lm04.me)
 
 > Base Website
-> ![](./github-assets/base.png)
+> ![](.github/assets/base.png)
 
 > Clash Warning
-> ![](./github-assets/clash.png)
+> ![](.github/assets/clash.png)
 
 ---
 

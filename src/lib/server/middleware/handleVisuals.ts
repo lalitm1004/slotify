@@ -1,4 +1,4 @@
-import { DEVICE_TOKEN } from "$lib/stores/DeviceStore";
+import { DEVICE_TOKEN } from "$lib/stores/MiscStores";
 import type { Handle } from "@sveltejs/kit";
 
 const handleVisuals: Handle = async ({ event, resolve }) => {

@@ -1,20 +1,15 @@
 <!doctype html>
 <html lang="en" data-device="">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
 
-<head>
-	<meta charset="utf-8" />
-	<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	%sveltekit.head%
-</head>
-
-<body data-sveltekit-preload-data="hover" class="mobile:overflow-hidden">
-	<div style="display: contents">%sveltekit.body%</div>
-
-	<!-- Cloudflare Web Analytics -->
-	<script defer src='https://static.cloudflareinsights.com/beacon.min.js'
-		data-cf-beacon='{"token": "672548d401844539ab65dc4015cf2a00"}'></script>
-	<!-- End Cloudflare Web Analytics -->
-</body>
-
+		<!-- Cloudflare Web Analytics -->
+		<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "672548d401844539ab65dc4015cf2a00"}'></script>
+		<!-- End Cloudflare Web Analytics -->
+	</body>
 </html>
