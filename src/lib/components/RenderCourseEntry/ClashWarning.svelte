@@ -26,7 +26,7 @@
         }
 
         if (clashingCourses.length === 0) {
-            return DOMPurify.sanitize("No time conflicts detected");
+            return "No time conflicts detected";
         }
 
         const entries = clashingCourses.map(
@@ -34,7 +34,7 @@
                 `<li>${c.course_codes.join(",")} - ${parseCourseComponent(c.component)} - ${c.course_name}</li>`,
         );
 
-        return DOMPurify.sanitize(`Clashes with:<ul>${entries.join("")}</ul>`);
+        return `Clashes with:<ul>${entries.join("")}</ul>`;
     });
 </script>
 
@@ -49,7 +49,7 @@
             sideOffset={8}
             class={`z-40 px-4 py-2 bg-neutral-50 border-2 border-neutral-800 rounded-md`}
         >
-            {@html tooltipText}
+            {@html DOMPurify.sanitize(tooltipText)}
         </Tooltip.Content>
     </Tooltip.Root>
 </Tooltip.Provider>
