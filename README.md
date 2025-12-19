@@ -11,8 +11,8 @@ A live deployment can be found at [slotify.lm04.me](https://slotify.lm04.me)
 > Clash Warning
 > ![](.github/assets/clash.png)
 
-> Swap Components
-> ![](.github/assets/swap.png)
+> Calendar View
+> ![](.github/assets/calendar.png)
 ---
 
 ## 💻 Running Locally
