@@ -213,7 +213,7 @@
             <TimeFormatSwitch />
 
             <Dialog.Close
-                class={` hover:bg-neutral-300 rounded-md transition-colors duration-200 cursor-pointer`}
+                class={`hover:bg-neutral-300 rounded-md transition-colors duration-200 cursor-pointer`}
             >
                 {@render xSvg()}
             </Dialog.Close>
@@ -270,16 +270,14 @@
                             {parseCourseComponent(block.course.component)}
                         </p>
 
-                        <p>
+                        <p class={`truncate`}>
                             {block.course.course_name}
                         </p>
 
                         <p class={`truncate text-neutral-600`}>
-                            {formatTime(block.timeslot.start_time!)}
-                            -
-                            {formatTime(block.timeslot.end_time!)}
-                            {#if block.timeslot.room}
-                                , {block.timeslot.room}
+                            {formatTime(block.timeslot.start_time!)} - {formatTime(
+                                block.timeslot.end_time!,
+                            )}{#if block.timeslot.room}, {block.timeslot.room}
                             {/if}
                         </p>
                     </div>
