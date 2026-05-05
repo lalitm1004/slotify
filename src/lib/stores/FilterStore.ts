@@ -1,12 +1,14 @@
-import { ComponentTypeEnum, type ComponentType, type CourseEntry } from "$lib/types/CourseEntry.type";
+import { type ComponentType, type CourseEntry } from "$lib/types/CourseEntry.type";
 import { derived, writable, type Readable } from "svelte/store";
 import Fuse from "fuse.js";
 import { SelectedEntriesStore } from "$lib/stores/SelectedEntriesStore";
 import { CourseEntriesStore } from "$lib/stores/TimetableStore";
 import { ClashingCourseEntries } from "$lib/stores/ClashingEntriesStore";
+import type { Day } from "$lib/types/TimeSlot.type";
 
 interface Filter {
-    components: Set<ComponentType>;
+    excludedComponents: Set<ComponentType>;
+    excludedDays: Set<Day>;
 
     showClashing: boolean;
     uweStrictMode: boolean;
@@ -16,8 +18,9 @@ interface Filter {
     studentGroupQuery: string;
 };
 
-export const defaultFilters = {
-    components: new Set(ComponentTypeEnum.options),
+export const defaultFilters: Filter = {
+    excludedComponents: new Set(),
+    excludedDays: new Set(),
     showClashing: true,
     uweStrictMode: false,
     courseCodeQuery: "",
@@ -55,9 +58,25 @@ export const FilteredCourseEntries: Readable<Set<CourseEntry["id"]>> = derived(
         candidates = candidates.filter(id => {
             const course = $courseEntries.get(id);
             if (course) {
-                return $filter.components.has(course.component[0])
+                const [componentType] = course.component;
+                const hasExcludedComponent = !$filter.excludedComponents.has(componentType);
+                return hasExcludedComponent;
             }
         });
+
+        // day filter
+        candidates = candidates.filter(id => {
+            const course = $courseEntries.get(id);
+            if (course) {
+                const hasExcludedDay = course.timeslots.some(timeslot =>
+                    timeslot.days.some(day =>
+                        $filter.excludedDays.has(day)
+                    )
+                );
+
+                return !hasExcludedDay;
+            }
+        })
 
         // exclude clashing entries
         if (!$filter.showClashing) {

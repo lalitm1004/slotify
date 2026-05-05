@@ -158,30 +158,36 @@
     };
 
     let calendarDiv: HTMLDivElement;
-    let containerDiv: HTMLDivElement;
     const handleDownload = async () => {
         if (!calendarDiv) return;
 
-        const originalOverflow = containerDiv?.style.overflow;
-        const originalHeight = containerDiv?.style.height;
+        const exportWrapper = document.createElement("div");
 
-        if (containerDiv) {
-            containerDiv.style.overflow = "visible";
-            containerDiv.style.height = "auto";
-        }
+        exportWrapper.style.background = "#fafafa";
+        exportWrapper.style.padding = "16px";
+        exportWrapper.style.display = "block";
+        exportWrapper.style.width = `${calendarDiv.scrollWidth}px`;
 
-        const dataUrl = await htmlToImage.toPng(calendarDiv, {
-            width: calendarDiv.scrollWidth,
-            height: calendarDiv.scrollHeight,
-            style: {
-                overflow: "visible",
-            },
+        const title = document.createElement("h1");
+        title.className = "px-auto font-amulya font-bold italic text-4xl";
+        title.innerText = "slotify";
+        title.style.display = "block";
+        title.style.textAlign = "center";
+        title.style.marginBottom = "12px";
+
+        const calendarClone = calendarDiv.cloneNode(true) as HTMLElement;
+
+        exportWrapper.appendChild(title);
+        exportWrapper.appendChild(calendarClone);
+
+        document.body.appendChild(exportWrapper);
+
+        const dataUrl = await htmlToImage.toPng(exportWrapper, {
+            width: exportWrapper.scrollWidth,
+            height: exportWrapper.scrollHeight,
         });
 
-        if (containerDiv) {
-            containerDiv.style.overflow = originalOverflow;
-            containerDiv.style.height = originalHeight;
-        }
+        document.body.removeChild(exportWrapper);
 
         const link = document.createElement("a");
         link.download = "calendar.png";
@@ -191,7 +197,6 @@
 </script>
 
 <div
-    bind:this={containerDiv}
     class={`h-[95dvh] w-[95dvw] bg-neutral-50 overflow-x-hidden overflow-y-scroll flex flex-col gap-4 p-4 border-2 border-neutral-800 rounded-md`}
 >
     <div class={`w-full flex justify-between items-center`}>

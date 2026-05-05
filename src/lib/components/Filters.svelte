@@ -1,12 +1,11 @@
 <script lang="ts">
     import { FilterStore } from "$lib/stores/FilterStore";
-    import {
-        ComponentTypeEnum,
-        type ComponentType,
-    } from "$lib/types/CourseEntry.type";
+    import { type ComponentType } from "$lib/types/CourseEntry.type";
+    import type { Day } from "$lib/types/TimeSlot.type";
     import { Checkbox, Label, ToggleGroup } from "bits-ui";
 
-    let components: ComponentType[] = $state(ComponentTypeEnum.options);
+    let excludedComponents: ComponentType[] = $state([]);
+    let excludedDays: Day[] = $state([]);
     let uweStrictMode: boolean = $state(false);
     let showClashing: boolean = $state(true);
     let courseCodeQuery: string = $state("");
@@ -14,7 +13,17 @@
     let studentGroupQuery: string = $state("");
 
     $effect(() => {
-        FilterStore.update((f) => ({ ...f, components: new Set(components) }));
+        FilterStore.update((f) => ({
+            ...f,
+            excludedComponents: new Set(excludedComponents),
+        }));
+    });
+
+    $effect(() => {
+        FilterStore.update((f) => ({
+            ...f,
+            excludedDays: new Set(excludedDays),
+        }));
     });
 
     $effect(() => {
@@ -39,7 +48,7 @@
 </script>
 
 <form class={`flex flex-col gap-2 px-4`}>
-    <div class={`flex gap-2`}>
+    <div class={`flex gap-4`}>
         <div class={`flex items-center gap-1`}>
             <Label.Root id={`uwe-strict-mode-label`} for={`uwe-strict-mode`}>
                 Only show courses open as UWE:
@@ -77,17 +86,19 @@
                 {/snippet}
             </Checkbox.Root>
         </div>
+    </div>
 
+    <div class={`flex gap-4`}>
         <div class={`flex items-center gap-1 `}>
-            <Label.Root>Display Components:</Label.Root>
+            <Label.Root>Filter by Component:</Label.Root>
 
             <ToggleGroup.Root
-                bind:value={components}
+                bind:value={excludedComponents}
                 id={`components`}
                 type="multiple"
                 class={`w-fit text-sm font-medium flex gap-1 rounded-md`}
             >
-                {@const style = `h-6 aspect-square border-2 border-neutral-800 data-[state=on]:bg-green-400 data-[state=off]:bg-red-400 rounded-md cursor-pointer transition-colors duration-200`}
+                {@const style = `h-6 aspect-square border-2 border-neutral-800 data-[state=off]:bg-green-400 data-[state=on]:bg-red-400 rounded-md cursor-pointer transition-colors duration-200`}
 
                 <ToggleGroup.Item
                     aria-label={`toggle show lectures`}
@@ -112,6 +123,38 @@
                 >
                     P
                 </ToggleGroup.Item>
+            </ToggleGroup.Root>
+        </div>
+
+        <div class={`flex items-center gap-1 `}>
+            <Label.Root>Filter by Days:</Label.Root>
+
+            <ToggleGroup.Root
+                bind:value={excludedDays}
+                id={`components`}
+                type="multiple"
+                class={`w-fit text-sm font-medium flex gap-1 rounded-md`}
+            >
+                {@const style = `h-6 aspect-square text-xs border-2 border-neutral-800 data-[state=off]:bg-green-400 data-[state=on]:bg-red-400 rounded-md cursor-pointer transition-colors duration-200`}
+                {@const days = [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                ]}
+
+                {#each days as day}
+                    <ToggleGroup.Item
+                        aria-label={`toggle display ${day}`}
+                        value={day}
+                        class={style}
+                    >
+                        {day.substring(0, 2)}
+                    </ToggleGroup.Item>
+                {/each}
             </ToggleGroup.Root>
         </div>
     </div>
