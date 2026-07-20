@@ -3,18 +3,25 @@ import timetableJson from "$lib/server/data/time-table.json";
 import { TimetableSchema } from "$lib/types/Timetable.type";
 import computeSHA256Hex from "$lib/utils/computeSHA256Hex";
 
-export const GET = async () => {
-    console.log("[slotify] GET /api/timetable hit");
+const timetable = TimetableSchema.parse(timetableJson);
+const hash = await computeSHA256Hex(timetable);
 
-    const result = await TimetableSchema.safeParseAsync(timetableJson);
+export const GET = async ({ request }) => {
+    const ifNoneMatch = request.headers.get("If-None-Match");
 
-    if (!result.success) {
-        console.error("[slotify] TimetableSchema validation failed:", result.error.message);
-        return json({ message: "TimetableSchema validation failed" }, { status: 500 });
+    if (ifNoneMatch === hash) {
+        return new Response(null, {
+            status: 304,
+            headers: {
+                ETag: hash,
+            },
+        });
     }
 
-    const timetable = result.data;
-    const hash = await computeSHA256Hex(timetable);
-
-    return json({ timetable, hash }, { status: 200 });
+    return json({ timetable, hash }, {
+        status: 200, headers: {
+            ETag: hash,
+            "Cache-Control": "public, max-age=0, must-revalidate"
+        }
+    });
 }
