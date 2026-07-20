@@ -50,7 +50,9 @@
 		<h1 class={`font-amulya font-bold italic text-3xl`}>slotify</h1>
 		<div class={`tracking-tighter`}>
 			<p>Please use a desktop machine</p>
-			<p>I lowkuinely cannot be bothered to make a responsive website</p>
+			<p>
+				I lowkenuinely cannot be bothered to make a responsive website
+			</p>
 
 			<p>Send PR if you want it that bad</p>
 		</div>
