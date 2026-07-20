@@ -7,7 +7,7 @@ const {
     store: SelectedEntriesStore, set: setSelectedEntries
 } = createCookiePersistentStore<Set<CourseEntry["id"]>>({
     tokenName: "slotify-selected-entries",
-    initialValue: new Set(),
+    initialValueFactory: () => new Set(),
     maxAgeSec: 60 * 60 * 24 * 30 * 5,
     encode: (data: Set<CourseEntry["id"]>): string => {
         return JSON.stringify(Array.from(data));

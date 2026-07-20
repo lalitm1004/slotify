@@ -4,7 +4,7 @@ import getCookie from "$lib/utils/getCookie";
 
 export interface PersistentStoreConfig<T> {
     tokenName: string;
-    initialValue: T;
+    initialValueFactory: () => T;
     maxAgeSec?: number;
     encode: (data: T) => string;
     decode: (raw: string) => T;
@@ -12,7 +12,7 @@ export interface PersistentStoreConfig<T> {
 
 const createCookiePersistentStore = <T>({
     tokenName,
-    initialValue,
+    initialValueFactory,
     maxAgeSec = 60 * 60 * 24 * 365,
     encode,
     decode,
@@ -21,7 +21,7 @@ const createCookiePersistentStore = <T>({
     set: (data: T | null) => void;
 } => {
     const getInitialData = (): T => {
-        if (!browser) return initialValue;
+        if (!browser) return initialValueFactory();
 
         const cookieData = getCookie(document.cookie, tokenName);
         if (cookieData) {
@@ -32,7 +32,7 @@ const createCookiePersistentStore = <T>({
             }
         }
 
-        return initialValue;
+        return initialValueFactory();
     }
 
     const store = writable<T>(getInitialData());
@@ -51,7 +51,7 @@ const createCookiePersistentStore = <T>({
             store.set(data);
         } else {
             document.cookie = `${tokenName}=null;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT`
-            store.set(initialValue);
+            store.set(initialValueFactory());
         }
     }
 
