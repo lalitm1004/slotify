@@ -8,6 +8,7 @@ from models import CourseEntry, Day, TimeSlot, Timetable
 
 TIMETABLE_XLSX_PATH: Final[Path] = Path("data/time-table.xlsx")
 OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
+ALLOWED_TERMS: Final[set[str]] = {"First half", "Full semester"}
 
 
 def merge_duplicate_entries(course_entries: List[CourseEntry]) -> None:
@@ -139,6 +140,7 @@ def populate_clashing_entries(course_entries: List[CourseEntry]) -> None:
 def parse_excel_to_timetable() -> Tuple[Timetable, int, int]:
     df = pd.read_excel(TIMETABLE_XLSX_PATH)
     df["Course Title"] = df["Course Title"].ffill()
+    df = df[df["Term"].fillna("").astype(str).str.strip().isin(ALLOWED_TERMS)].copy()
 
     df = df.rename(
         columns={
