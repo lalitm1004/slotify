@@ -4,13 +4,44 @@ from datetime import datetime
 from pathlib import Path
 from typing import Final, List, Tuple
 
-from models import CourseEntry, TimeSlot, Timetable
+from models import CourseEntry, Day, TimeSlot, Timetable
 
 TIMETABLE_XLSX_PATH: Final[Path] = Path("data/time-table.xlsx")
 OUTPUT_JSON_PATH: Final[Path] = Path("data/time-table.json")
 
 
 def merge_duplicate_entries(course_entries: List[CourseEntry]) -> None:
+    def merge_timeslots(timeslots: List[TimeSlot]) -> List[TimeSlot]:
+        merged: List[TimeSlot] = []
+        merged_index = {}
+        day_order = {day: idx for idx, day in enumerate(Day)}
+
+        for slot in timeslots:
+            key = (slot.start_time, slot.end_time, slot.room)
+            if key not in merged_index:
+                merged_index[key] = len(merged)
+                merged.append(
+                    TimeSlot.model_construct(
+                        days=list(slot.days),
+                        start_time=slot.start_time,
+                        end_time=slot.end_time,
+                        room=slot.room,
+                    )
+                )
+                continue
+
+            existing = merged[merged_index[key]]
+            existing_days = set(existing.days)
+            for day in slot.days:
+                if day not in existing_days:
+                    existing.days.append(day)
+                    existing_days.add(day)
+
+        for slot in merged:
+            slot.days = sorted(slot.days, key=lambda day: day_order[day])
+
+        return merged
+
     entry_groups = defaultdict(list)
 
     for entry in course_entries:
@@ -33,7 +64,7 @@ def merge_duplicate_entries(course_entries: List[CourseEntry]) -> None:
             all_timeslots.extend(entry.timeslots)
             all_student_groups.update(entry.student_groups)
 
-        base_entry.timeslots = all_timeslots
+        base_entry.timeslots = merge_timeslots(all_timeslots)
         base_entry.student_groups = sorted(list(all_student_groups))
 
         merged.append(base_entry)
@@ -107,14 +138,15 @@ def populate_clashing_entries(course_entries: List[CourseEntry]) -> None:
 
 def parse_excel_to_timetable() -> Tuple[Timetable, int, int]:
     df = pd.read_excel(TIMETABLE_XLSX_PATH)
+    df["Course Title"] = df["Course Title"].ffill()
 
     df = df.rename(
         columns={
-            "Course Name": "course_name",
+            "Course Title": "course_name",
             "Course Code": "course_code",
             "Component": "component",
-            "Major": "student_groups",
-            "Rooms": "room",
+            "Student Block": "student_groups",
+            "Room": "room",
             "Day": "days",
             "Start Time": "start_time",
             "End Time": "end_time",
@@ -135,7 +167,7 @@ def parse_excel_to_timetable() -> Tuple[Timetable, int, int]:
             entry = CourseEntry(
                 course_name=row["course_name"],
                 course_codes=row["course_code"],
-                component=row["component"],
+                component=row["Section"],
                 student_groups=row["student_groups"],
                 timeslots=[timeslot],
                 open_as_uwe=row["open_as_uwe"],

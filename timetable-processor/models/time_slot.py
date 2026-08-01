@@ -97,7 +97,7 @@ class TimeSlot(BaseModel):
         if re.fullmatch(r"\d{1,2}\.\d{2}\s*[APap][Mm]", v):
             v = v.replace(".", ":").upper()
 
-        for pattern in ("%H:%M:%S", "%H:%M", "%I:%M%p"):
+        for pattern in ("%H:%M:%S", "%H:%M", "%I:%M%p", "%I:%M %p"):
             try:
                 parsed = datetime.strptime(v, pattern)
                 return parsed.strftime("%H:%M")
